@@ -1,0 +1,157 @@
+@import './theme.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background-color: var(--ll-page);
+  color: var(--ll-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ll-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--ll-primary-hover);
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* 顶部导航与页眉 */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--ll-navy);
+  box-shadow: 0 4px 20px rgba(19, 35, 58, 0.12);
+  height: 64px;
+}
+
+.header-inner {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 20px;
+}
+
+.nav-item {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 页脚 */
+.app-footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 48px 24px 32px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.footer-brand h4 {
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-links a, .footer-links button {
+  color: #94a3b8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
+
+.footer-links a:hover, .footer-links button:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 24px;
+  font-size: 13px;
+}
+
+/* 浮动客服悬浮按钮 */
+.support-floating-btn {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(19, 35, 58, 0.24);
+  border-radius: 999px;
+}

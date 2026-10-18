@@ -1,0 +1,121 @@
+:root {
+  /* 主色（LOGO 双环渐变） */
+  --ll-indigo: #4F46E5;
+  --ll-azure:  #0EA5E9;
+  --ll-sky:    #38BDF8;
+  --ll-cyan:   #22D3EE;
+
+  /* 点缀色 */
+  --ll-amber:  #F59E0B;
+  --ll-amber-strong: #B45309;
+  --ll-coral:  #FB7185;
+
+  /* 中性 / 背景 */
+  --ll-navy:   #1F3864;
+  --ll-ink:    #0F172A;
+  --ll-muted:  #64748B;
+  --ll-page:   #f5f6f8;
+
+  /* 渐变 token */
+  --ll-brand-gradient: linear-gradient(92deg, var(--ll-sky) 0%, var(--ll-cyan) 100%);
+  --ll-accent-gradient: linear-gradient(90deg, var(--ll-azure) 0%, var(--ll-cyan) 100%);
+  --ll-ring-gradient: linear-gradient(135deg, var(--ll-indigo) 0%, var(--ll-azure) 100%);
+  --ll-spark-gradient: linear-gradient(90deg, var(--ll-amber) 0%, var(--ll-coral) 100%);
+
+  /* Brand System v1 */
+  --ll-brand-base: #13233A;
+  --ll-brand-base-deep: #0B1220;
+  --ll-brand-surface: #1F3864;
+  --ll-brand-red: #9B2D20;
+  --ll-brand-gold: #C8A45C;
+  --ll-brand-blue: #1E6EB8;
+  --ll-brand-gold-soft: #F6D38A;
+  --ll-brand-hero-gradient: linear-gradient(125deg, var(--ll-brand-base) 0%, var(--ll-brand-surface) 58%, #233F5F 100%);
+
+  /* Liquid-glass */
+  --ll-glass-bg: rgba(255,255,255,.055);
+  --ll-glass-border: rgba(255,255,255,.18);
+  --ll-glass-shadow: 0 24px 70px rgba(19,35,58,.18);
+
+  /* 语义色 */
+  --ll-white:  #ffffff;
+  --ll-gray:   #4b5563;
+  --ll-price:  #d93025;
+  --ll-thumb-bg: #eef1f6;
+  --ll-thumb-fg: #b9c3d4;
+
+  /* 浅天蓝交互色系 */
+  --ll-skyblue: #A9CADA;
+  --ll-skyblue-hover: #B7D4E2;
+  --ll-skyblue-active: #9BC0D9;
+  --ll-skyblue-border: #5B8FB5;
+  --ll-skyblue-on: #1F3864;
+  --ll-skyblue-disabled: rgba(100, 197, 239, 0.45);
+  --ll-skyblue-on-disabled: rgba(31, 56, 100, 0.5);
+
+  --ll-primary: #1E6EB8;
+  --ll-primary-hover: #2774BD;
+  --ll-primary-active: #155B9E;
+
+  --ll-transition-fast: 0.2s;
+  --ll-transition-base: 0.25s;
+}
+
+/* 品牌字标统一规范 */
+.ll-wordmark {
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: -0.35px;
+  white-space: nowrap;
+}
+.ll-wordmark .ll-lan { color: #fff; }
+.ll-wordmark .ll-link { color: var(--ll-amber); font-weight: 700; }
+.ll-wordmark .ll-shopping { color: inherit; font-weight: 700; }
+.ll-wordmark-on-light .ll-lan { color: var(--ll-ink); }
+.ll-wordmark-on-light .ll-shopping { color: var(--ll-ink); }
+
+/* 加入购物车专用按钮样式 */
+.ll-add-cart.ant-btn {
+  background: var(--ll-brand-gradient) !important;
+  border-color: transparent !important;
+  color: var(--ll-navy) !important;
+  font-weight: 600;
+}
+.ll-add-cart.ant-btn:not(:disabled):hover {
+  filter: brightness(1.05);
+  color: var(--ll-navy) !important;
+}
+
+/* 顶栏与交互 */
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--ll-transition-fast) ease;
+}
+.user-trigger:hover {
+  background: rgba(155, 192, 217, 0.20);
+}
+
+.id-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.id-vip { background: #F59E0B; color: #fff; }
+.id-admin { background: #9B2D20; color: #fff; }
+.id-merchant { background: #1E6EB8; color: #fff; }
+
+/* 英雄区漂移动画 */
+@keyframes ambientFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-18px, 18px, 0) scale(1.06); }
+}

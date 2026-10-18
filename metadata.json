@@ -1,0 +1,6 @@
+{
+  "name": "LANLinkshopping",
+  "description": "聚合型一体多元化B2B电商平台，提供供应链商品采购、商户入驻、企业账期、钱包支付、会员积分与客户智能服务。",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
