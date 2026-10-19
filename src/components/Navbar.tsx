@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Badge, Button, Dropdown, MenuProps } from 'antd'
-import { BellOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  BellOutlined,
+  ShoppingCartOutlined,
+  UserOutlined,
+  ExperimentOutlined
+} from '@ant-design/icons'
 import { useStore } from '../store/storeContext'
 import { BrandWordmark } from './BrandWordmark'
 import { IndustryCategoryMenu } from './IndustryCategoryMenu'
@@ -11,9 +16,20 @@ export const Navbar: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [mallMenuOpen, setMallMenuOpen] = useState(false)
+  const [cartPulse, setCartPulse] = useState(false)
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const prevCartCount = useRef(cartCount)
   const unreadCount = user?.unreadCount || 0
+
+  useEffect(() => {
+    if (cartCount !== prevCartCount.current) {
+      setCartPulse(true)
+      prevCartCount.current = cartCount
+      const timer = setTimeout(() => setCartPulse(false), 380)
+      return () => clearTimeout(timer)
+    }
+  }, [cartCount])
 
   const hasPerm = (perm: string) => {
     if (!user) return false
@@ -65,6 +81,11 @@ export const Navbar: React.FC = () => {
       label: '👑 会员中心',
       onClick: () => navigate('/membership')
     },
+    {
+      key: 'ui-lab',
+      label: '✦ 21st.dev 动效实验室',
+      onClick: () => navigate('/ui-lab')
+    },
     { type: 'divider' },
     {
       key: 'profile',
@@ -89,7 +110,7 @@ export const Navbar: React.FC = () => {
     {
       key: 'settings',
       label: '⚙️ 账户设置',
-      onClick: () => navigate('/me?tab=settings')
+      onClick: () => navigate('/settings')
     },
     { type: 'divider' },
     {
@@ -102,6 +123,14 @@ export const Navbar: React.FC = () => {
       }
     }
   ].filter(Boolean) as MenuProps['items']
+
+  const isOrdersActive =
+    location.pathname.startsWith('/orders') ||
+    location.pathname.startsWith('/my-orders') ||
+    location.pathname.startsWith('/order/')
+
+  const isMerchantApplyActive =
+    location.pathname === '/merchant' || location.pathname === '/merchant/apply'
 
   return (
     <header className="app-header">
@@ -124,6 +153,7 @@ export const Navbar: React.FC = () => {
           <div
             style={{ position: 'relative' }}
             onMouseEnter={() => setMallMenuOpen(true)}
+            onMouseLeave={() => setMallMenuOpen(false)}
           >
             <Link
               to="/mall"
@@ -154,8 +184,8 @@ export const Navbar: React.FC = () => {
 
           {hasPerm('order:view') && (
             <Link
-              to="/orders"
-              className={`nav-item ${location.pathname.startsWith('/orders') ? 'active' : ''}`}
+              to="/my-orders"
+              className={`nav-item ${isOrdersActive ? 'active' : ''}`}
             >
               我的订单
             </Link>
@@ -163,15 +193,15 @@ export const Navbar: React.FC = () => {
 
           {isAdmin ? (
             <Link
-              to="/admin/merchants"
+              to="/admin/dashboard"
               className={`nav-item ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
             >
-              商户管理
+              运营后台
             </Link>
           ) : user && !isMerchant ? (
             <Link
-              to="/merchant"
-              className={`nav-item ${location.pathname === '/merchant' ? 'active' : ''}`}
+              to="/merchant/apply"
+              className={`nav-item ${isMerchantApplyActive ? 'active' : ''}`}
             >
               商户入驻
             </Link>
@@ -196,6 +226,13 @@ export const Navbar: React.FC = () => {
           )}
 
           <Link
+            to="/ui-lab"
+            className={`nav-item nav-item-lab ${location.pathname === '/ui-lab' ? 'active' : ''}`}
+          >
+            <ExperimentOutlined /> 21st 动效库
+          </Link>
+
+          <Link
             to="/about"
             className={`nav-item ${location.pathname === '/about' ? 'active' : ''}`}
           >
@@ -218,16 +255,18 @@ export const Navbar: React.FC = () => {
             </Badge>
           )}
 
-          <Badge count={cartCount} overflowCount={99} size="small">
-            <Button
-              type="text"
-              icon={<ShoppingCartOutlined style={{ color: '#fff' }} />}
-              style={{ color: '#fff' }}
-              onClick={() => navigate('/cart')}
-            >
-              购物车
-            </Button>
-          </Badge>
+          <div className={cartPulse ? 'll-badge-pulse' : ''}>
+            <Badge count={cartCount} overflowCount={99} size="small">
+              <Button
+                type="text"
+                icon={<ShoppingCartOutlined style={{ color: '#fff' }} />}
+                style={{ color: '#fff' }}
+                onClick={() => navigate('/cart')}
+              >
+                购物车
+              </Button>
+            </Badge>
+          </div>
 
           {user ? (
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>

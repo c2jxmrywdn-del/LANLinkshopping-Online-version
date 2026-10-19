@@ -36,6 +36,7 @@ import { Me } from './views/Me'
 import { AccountSettings } from './views/AccountSettings'
 import { Login } from './views/Login'
 import { Register } from './views/Register'
+import { UiLab } from './views/UiLab'
 
 // Admin Views
 import { AdminDashboard } from './views/admin/AdminDashboard'
@@ -66,11 +67,16 @@ export const App: React.FC = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/mall" element={<Mall />} />
+          <Route path="/ui-lab" element={<UiLab />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+
+          {/* Orders & Bidirectional Route Aliases */}
           <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/order/:id" element={<OrderDetail />} />
+          <Route path="/orders" element={<MyOrders />} />
+          <Route path="/orders/:orderNo" element={<OrderDetail />} />
+          <Route path="/order/:orderNo" element={<OrderDetail />} />
 
           {/* Wallet & Payment */}
           <Route path="/wallet" element={<Wallet />} />
@@ -83,7 +89,8 @@ export const App: React.FC = () => {
           <Route path="/credit-term/bills" element={<CreditTermBills />} />
           <Route path="/credit-term/bills/:id" element={<CreditTermBillDetail />} />
 
-          {/* Merchant Features */}
+          {/* Merchant Features & Route Aliases */}
+          <Route path="/merchant" element={<MerchantApply />} />
           <Route path="/merchant/apply" element={<MerchantApply />} />
           <Route path="/merchant/products" element={<MerchantProducts />} />
           <Route path="/merchant/traffic" element={<MerchantTraffic />} />
@@ -108,9 +115,10 @@ export const App: React.FC = () => {
           <Route path="/settings" element={<AccountSettings />} />
           <Route path="/account/settings" element={<AccountSettings />} />
 
-          {/* Info Pages */}
+          {/* Info & Privacy Pages */}
           <Route path="/about" element={<AboutUs />} />
           <Route path="/privacy" element={<PrivacyCenter />} />
+          <Route path="/privacy/cookies" element={<PrivacyCenter />} />
         </Route>
 
         {/* Auth Pages (standalone) */}

@@ -1,11 +1,12 @@
 import React from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Card, Steps, Descriptions, Table, Tag, Button, Modal, message, Row, Col } from 'antd'
-import { ArrowLeftOutlined, CheckCircleOutlined, CarOutlined } from '@ant-design/icons'
+import { Card, Steps, Descriptions, Table, Tag, Button, message, Row, Col } from 'antd'
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useStore } from '../store/storeContext'
 
 export const OrderDetail: React.FC = () => {
-  const { orderNo } = useParams<{ orderNo: string }>()
+  const params = useParams<{ orderNo?: string; id?: string }>()
+  const orderNo = params.orderNo || params.id
   const navigate = useNavigate()
   const { orders, payOrder, cancelOrder } = useStore()
 
@@ -15,7 +16,7 @@ export const OrderDetail: React.FC = () => {
     return (
       <div className="main-container" style={{ textAlign: 'center', padding: '60px 0' }}>
         <h2>未找到该订单</h2>
-        <Button type="primary" onClick={() => navigate('/orders')}>返回订单列表</Button>
+        <Button type="primary" onClick={() => navigate('/my-orders')}>返回订单列表</Button>
       </div>
     )
   }
@@ -52,25 +53,26 @@ export const OrderDetail: React.FC = () => {
       title: '单价',
       dataIndex: 'price',
       key: 'price',
-      render: (v: number) => `¥${v.toFixed(2)}`
+      render: (v: number) => <span className="ll-tabular-nums">¥{v.toFixed(2)}</span>
     },
     {
       title: '数量',
       dataIndex: 'quantity',
-      key: 'quantity'
+      key: 'quantity',
+      render: (v: number) => <span className="ll-tabular-nums">{v}</span>
     },
     {
       title: '小计',
       dataIndex: 'subtotal',
       key: 'subtotal',
-      render: (v: number) => <b style={{ color: '#e11d48' }}>¥${v.toFixed(2)}</b>
+      render: (v: number) => <b className="ll-tabular-nums" style={{ color: '#e11d48' }}>¥{v.toFixed(2)}</b>
     }
   ]
 
   return (
     <div className="main-container">
       <div style={{ marginBottom: '20px' }}>
-        <Link to="/orders" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b' }}>
+        <Link to="/my-orders" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b' }}>
           <ArrowLeftOutlined /> 返回我的订单列表
         </Link>
       </div>
@@ -79,7 +81,7 @@ export const OrderDetail: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <div>
             <div style={{ fontSize: '12px', color: '#64748b' }}>采购订单号</div>
-            <h1 style={{ fontSize: '22px', fontWeight: 800, margin: '4px 0', color: 'var(--ll-navy)' }}>
+            <h1 className="ll-tabular-nums" style={{ fontSize: '22px', fontWeight: 800, margin: '4px 0', color: 'var(--ll-navy)' }}>
               {order.orderNo}
             </h1>
             <span style={{ fontSize: '13px', color: '#64748b' }}>下单时间：{order.createTime}</span>
@@ -87,7 +89,7 @@ export const OrderDetail: React.FC = () => {
 
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '12px', color: '#64748b' }}>订单应付总额</div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#e11d48' }}>
+            <div className="ll-tabular-nums" style={{ fontSize: '28px', fontWeight: 800, color: '#e11d48' }}>
               ¥{order.totalAmount.toFixed(2)}
             </div>
             <Tag color={order.payStatus === 1 ? 'green' : 'orange'}>
@@ -136,11 +138,13 @@ export const OrderDetail: React.FC = () => {
                 {order.payStatus === 1 ? '已完成支付' : '尚未支付'}
               </Descriptions.Item>
               {order.originalAmount && (
-                <Descriptions.Item label="商品原价">¥{order.originalAmount.toFixed(2)}</Descriptions.Item>
+                <Descriptions.Item label="商品原价">
+                  <span className="ll-tabular-nums">¥{order.originalAmount.toFixed(2)}</span>
+                </Descriptions.Item>
               )}
               {order.pointsDeducted && order.pointsDeducted > 0 ? (
                 <Descriptions.Item label="积分抵扣金额">
-                  <span style={{ color: '#10b981' }}>-¥{order.pointsDeducted.toFixed(2)}</span>
+                  <span className="ll-tabular-nums" style={{ color: '#10b981' }}>-¥{order.pointsDeducted.toFixed(2)}</span>
                 </Descriptions.Item>
               ) : null}
             </Descriptions>

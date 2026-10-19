@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Button, Input, Tag } from 'antd'
-import { MessageOutlined, CloseOutlined, SendOutlined, CustomerServiceOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { CloseOutlined, SendOutlined, CustomerServiceOutlined } from '@ant-design/icons'
 import { useStore } from '../store/storeContext'
+import { MagneticButton } from './MotionPrimitives'
 
 interface Message {
   id: number
@@ -88,45 +89,39 @@ export const SupportChat: React.FC = () => {
 
   return (
     <>
-      {/* Floating Launcher Button */}
+      {/* 21st.dev Magnetic Floating Launcher Button */}
       <div className="support-floating-btn">
-        <Button
-          type="primary"
-          shape="round"
-          size="large"
-          icon={<CustomerServiceOutlined />}
+        <MagneticButton
+          variant="navy"
+          size="md"
+          strength={0.35}
           onClick={() => setOpen(prev => !prev)}
           style={{
-            height: '48px',
-            padding: '0 20px',
-            background: 'linear-gradient(135deg, var(--ll-navy), var(--ll-primary))',
-            borderColor: 'var(--ll-brand-gold)',
-            color: '#fff',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 8px 24px rgba(19, 35, 58, 0.3)'
+            borderRadius: '999px',
+            padding: '12px 22px',
+            border: '1px solid rgba(200, 164, 92, 0.55)'
           }}
         >
-          {open ? '关闭客服' : '专属客服'}
-        </Button>
+          <CustomerServiceOutlined style={{ color: '#F6D38A', fontSize: '16px' }} />
+          <span>{open ? '收起客服' : '专属客服'}</span>
+        </MagneticButton>
       </div>
 
-      {/* Chat Window */}
+      {/* Spring-Animated Chat Window */}
       {open && (
         <div
+          className="ll-stagger-item"
           style={{
             position: 'fixed',
             right: '28px',
             bottom: '88px',
-            width: '380px',
+            width: '385px',
             maxWidth: 'calc(100vw - 40px)',
-            height: '520px',
+            height: '530px',
             maxHeight: 'calc(100vh - 120px)',
             background: '#fff',
-            borderRadius: '20px',
-            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.25)',
+            borderRadius: '22px',
+            boxShadow: '0 24px 68px rgba(15, 23, 42, 0.28)',
             border: '1px solid #e2e8f0',
             zIndex: 1000,
             display: 'flex',
@@ -138,7 +133,7 @@ export const SupportChat: React.FC = () => {
           <div
             style={{
               padding: '16px 20px',
-              background: 'linear-gradient(135deg, var(--ll-navy), #233f5f)',
+              background: 'linear-gradient(135deg, #13233A, #1F3864)',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
@@ -148,20 +143,20 @@ export const SupportChat: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '34px',
+                  height: '34px',
                   borderRadius: '50%',
-                  background: 'var(--ll-primary)',
+                  background: 'linear-gradient(135deg, #C8A45C, #F59E0B)',
                   display: 'grid',
                   placeItems: 'center',
-                  color: '#fff'
+                  color: '#0F172A'
                 }}
               >
                 <CustomerServiceOutlined />
               </div>
               <div>
                 <strong style={{ fontSize: '15px' }}>LANLink 知识库客服</strong>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>平台权威答疑 · 7x24 在线</div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.72)' }}>平台权威答疑 · 7x24 在线</div>
               </div>
             </div>
             <Button
@@ -186,7 +181,7 @@ export const SupportChat: React.FC = () => {
             {QUICK_QUESTIONS.map(q => (
               <Tag
                 key={q}
-                style={{ cursor: 'pointer', margin: 0 }}
+                style={{ cursor: 'pointer', margin: 0, borderRadius: '6px' }}
                 color="blue"
                 onClick={() => handleSend(q)}
               >
@@ -226,7 +221,7 @@ export const SupportChat: React.FC = () => {
                     background: m.sender === 'user' ? 'var(--ll-primary)' : '#fff',
                     color: m.sender === 'user' ? '#fff' : 'var(--ll-ink)',
                     fontSize: '13px',
-                    lineHeight: 1.5,
+                    lineHeight: 1.55,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                     wordBreak: 'break-word'
                   }}
@@ -240,7 +235,7 @@ export const SupportChat: React.FC = () => {
             ))}
             {loading && (
               <div style={{ alignSelf: 'flex-start', color: '#94a3b8', fontSize: '12px' }}>
-                客服正在查找知识库...
+                客服正在检索知识库...
               </div>
             )}
           </div>

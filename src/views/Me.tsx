@@ -8,10 +8,13 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
   PlusOutlined,
-  CheckCircleOutlined
+  WalletOutlined,
+  CrownOutlined,
+  FileProtectOutlined
 } from '@ant-design/icons'
 import { useStore } from '../store/storeContext'
 import { Address } from '../types'
+import { SpotlightCard, AnimatedNumber } from '../components/MotionPrimitives'
 
 export const Me: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -24,7 +27,10 @@ export const Me: React.FC = () => {
     deleteAddress,
     setDefaultAddress,
     loginLogs,
-    updateUserSecurity
+    updateUserSecurity,
+    walletBalance,
+    creditAccount,
+    memberCard
   } = useStore()
 
   const currentTab = searchParams.get('tab') || 'profile'
@@ -74,6 +80,15 @@ export const Me: React.FC = () => {
     addrForm.resetFields()
   }
 
+  const handleMarkOneRead = (id: number) => {
+    setMessagesList(prev => {
+      const next = prev.map(m => (m.id === id ? { ...m, read: true } : m))
+      const unread = next.filter(m => !m.read).length
+      if (user) updateUserSecurity({ unreadCount: unread })
+      return next
+    })
+  }
+
   const handleMarkAllRead = () => {
     setMessagesList(prev => prev.map(m => ({ ...m, read: true })))
     if (user) updateUserSecurity({ unreadCount: 0 })
@@ -86,37 +101,118 @@ export const Me: React.FC = () => {
   }
 
   return (
-    <div className="main-container" style={{ maxWidth: '1040px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <div
-          style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            background: 'var(--ll-primary)',
-            color: '#fff',
-            display: 'grid',
-            placeItems: 'center',
-            fontSize: '24px',
-            fontWeight: 800
-          }}
-        >
-          {user?.nickname ? user.nickname.slice(0, 1) : <UserOutlined />}
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: 'var(--ll-navy)' }}>
-              {user?.nickname || '未登录用户'}
-            </h1>
-            {user?.identity?.code === 'vip' && <Tag color="gold">VIP 采购商</Tag>}
-            {user?.roleCode === 'admin' && <Tag color="red">平台管理员</Tag>}
-            {user?.roleCode === 'merchant' && <Tag color="blue">认证商户</Tag>}
-          </div>
-          <span style={{ color: '#64748b', fontSize: '13px' }}>
-            绑定手机：{user?.phone} · 身份职责：{user?.identity?.serviceScope || '标准权限'}
-          </span>
-        </div>
-      </div>
+    <div className="main-container" style={{ maxWidth: '1080px' }}>
+      {/* 21st.dev Spotlight User Profile & Asset Summary Header */}
+      <SpotlightCard
+        spotlightColor="rgba(200, 164, 92, 0.24)"
+        borderBeam
+        style={{
+          padding: '28px 32px',
+          marginBottom: '24px',
+          background: 'linear-gradient(135deg, #13233A 0%, #1F3864 100%)',
+          color: '#fff'
+        }}
+      >
+        <Row gutter={[24, 20]} align="middle">
+          <Col xs={24} md={11}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #C8A45C, #F59E0B)',
+                  color: '#0F172A',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: '24px',
+                  fontWeight: 800,
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.25)'
+                }}
+              >
+                {user?.nickname ? user.nickname.slice(0, 1) : <UserOutlined />}
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <h1 style={{ fontSize: '22px', fontWeight: 800, margin: 0, color: '#fff' }}>
+                    {user?.nickname || '未登录用户'}
+                  </h1>
+                  {user?.identity?.code === 'vip' && <Tag color="gold">VIP 采购商</Tag>}
+                  {user?.roleCode === 'admin' && <Tag color="red">平台管理员</Tag>}
+                  {user?.roleCode === 'merchant' && <Tag color="blue">认证商户</Tag>}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px', marginTop: '4px' }}>
+                  绑定手机：{user?.phone} · {user?.identity?.serviceScope || '企业标准采购权限'}
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          <Col xs={24} md={13}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '12px'
+              }}
+            >
+              <div
+                onClick={() => navigate('/wallet')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '14px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <WalletOutlined /> 企业钱包余额
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#F6D38A', marginTop: '4px' }}>
+                  <AnimatedNumber value={walletBalance} prefix="¥" decimals={2} />
+                </div>
+              </div>
+
+              <div
+                onClick={() => navigate('/credit-term')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '14px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <FileProtectOutlined /> 可用授信账期
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#38BDF8', marginTop: '4px' }}>
+                  <AnimatedNumber value={creditAccount.availableLimit} prefix="¥" />
+                </div>
+              </div>
+
+              <div
+                onClick={() => navigate('/membership')}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '14px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <CrownOutlined /> 会员可用积分
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399', marginTop: '4px' }}>
+                  <AnimatedNumber value={memberCard.points} suffix=" 分" />
+                </div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </SpotlightCard>
 
       <Card style={{ borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 8px 24px rgba(0,0,0,0.03)' }}>
         <Tabs
@@ -154,19 +250,25 @@ export const Me: React.FC = () => {
               ),
               children: (
                 <div style={{ padding: '8px 0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '13px', color: '#64748b' }}>
+                      点击单条未读消息即可标记为已读，顶部导航角标实时同步
+                    </span>
                     <Button onClick={handleMarkAllRead}>全部标为已读</Button>
                   </div>
                   <List
                     dataSource={messagesList}
                     renderItem={item => (
                       <List.Item
+                        onClick={() => !item.read && handleMarkOneRead(item.id)}
                         style={{
                           background: item.read ? '#fff' : '#f8fafc',
                           padding: '16px',
                           borderRadius: '12px',
                           marginBottom: '8px',
-                          border: '1px solid #e2e8f0'
+                          border: item.read ? '1px solid #e2e8f0' : '1px solid rgba(30, 110, 184, 0.35)',
+                          cursor: item.read ? 'default' : 'pointer',
+                          transition: 'all 0.2s ease'
                         }}
                       >
                         <div style={{ width: '100%' }}>

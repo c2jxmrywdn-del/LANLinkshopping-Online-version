@@ -102,13 +102,13 @@ export const Checkout: React.FC = () => {
             try {
               await payOrder(order.orderNo, payType === 'balance' ? 'wallet' : 'mock')
               message.success('支付成功！已进入发货流程')
-              navigate('/orders')
+              navigate('/my-orders')
             } catch (err: any) {
               message.error(err.message || '支付失败')
-              navigate('/orders')
+              navigate('/my-orders')
             }
           },
-          onCancel: () => navigate('/orders')
+          onCancel: () => navigate('/my-orders')
         })
       }
     } finally {

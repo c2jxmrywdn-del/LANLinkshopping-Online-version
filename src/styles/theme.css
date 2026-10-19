@@ -57,8 +57,9 @@
   --ll-primary-hover: #2774BD;
   --ll-primary-active: #155B9E;
 
-  --ll-transition-fast: 0.2s;
+  --ll-transition-fast: 0.18s;
   --ll-transition-base: 0.25s;
+  --ll-spring-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* 品牌字标统一规范 */
@@ -79,11 +80,16 @@
   background: var(--ll-brand-gradient) !important;
   border-color: transparent !important;
   color: var(--ll-navy) !important;
-  font-weight: 600;
+  font-weight: 700;
+  transition: transform 180ms var(--ll-spring-ease), filter 180ms ease !important;
 }
 .ll-add-cart.ant-btn:not(:disabled):hover {
-  filter: brightness(1.05);
+  filter: brightness(1.06);
   color: var(--ll-navy) !important;
+  transform: translateY(-1px);
+}
+.ll-add-cart.ant-btn:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 /* 顶栏与交互 */
@@ -92,14 +98,17 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   line-height: 1.4;
   color: #fff;
   cursor: pointer;
-  transition: background var(--ll-transition-fast) ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  transition: all var(--ll-transition-fast) ease;
 }
 .user-trigger:hover {
-  background: rgba(155, 192, 217, 0.20);
+  background: rgba(155, 192, 217, 0.22);
+  border-color: rgba(200, 164, 92, 0.45);
 }
 
 .id-badge {
@@ -114,8 +123,127 @@
 .id-admin { background: #9B2D20; color: #fff; }
 .id-merchant { background: #1E6EB8; color: #fff; }
 
+/* 等宽数字对齐 */
+.ll-tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* 21st.dev 流光边框动画 (Border Beam) */
+.ll-border-beam-line {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg) at 50% 50%,
+    transparent 0deg,
+    transparent 270deg,
+    var(--beam-color, #C8A45C) 330deg,
+    #38BDF8 355deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: llBorderSpin 4.5s linear infinite;
+  z-index: 2;
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes llBorderSpin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* 21st.dev 按钮扫光微交互 (Shimmer Sweep) */
+.ll-shimmer-sweep {
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.42),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.65s var(--ll-spring-ease);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ll-shimmer-btn:hover .ll-shimmer-sweep {
+  left: 150%;
+}
+
+/* 21st.dev 骨架屏流光 (Shimmer Skeleton) */
+.ll-shimmer-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: llSkeletonWave 1.6s infinite;
+}
+
+@keyframes llSkeletonWave {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 错落入场动画 (Staggered Reveal) */
+@keyframes llStaggerFadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ll-stagger-item {
+  animation: llStaggerFadeUp 420ms var(--ll-spring-ease) both;
+}
+
 /* 英雄区漂移动画 */
 @keyframes ambientFloat {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
   50% { transform: translate3d(-18px, 18px, 0) scale(1.06); }
+}
+
+/* 购物车徽标弹性脉冲 */
+@keyframes llBadgePulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.26); }
+  100% { transform: scale(1); }
+}
+
+.ll-badge-pulse {
+  animation: llBadgePulse 360ms var(--ll-spring-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
