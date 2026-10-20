@@ -19,5 +19,24 @@ const routes=[{path:'/',component:MainLayout,children:[
 {path:'communications/learning/:candidateId/review',name:'admin-communications-learning-review',component:()=>import('../views/admin/CustomerCommunicationLearningReview.vue')},
 {path:'support-learning',name:'admin-support-learning',component:()=>import('../views/admin/SupportLearningSandbox.vue')}]}]
 const router=createRouter({history:createWebHistory(),routes})
-router.beforeEach(to=>{const user=readUser();if(to.meta.admin){if(!user||user.roleCode!=='admin')return{name:'home'};return true}if(to.meta.auth&&!user)return{name:'login',query:{redirect:to.fullPath}};if(to.meta.perms&&user&&!hasPerms(user,to.meta.perms))return{name:'home'};return true})
+router.beforeEach(async to=>{
+  let user=readUser()
+  const needsSession=Boolean(to.meta.auth||to.meta.admin||(to.meta.perms&&to.meta.perms.length))
+  if(needsSession){
+    // Verify the browser's cached identity against the session cookie before entering
+    // protected second-, third- and fourth-level screens. The store uses a short
+    // verification cache to avoid an /auth/me request on every click.
+    const {useUserStore}=await import('../store/user')
+    const session=useUserStore()
+    if(!session.user&&user)session.user=user
+    user=await session.fetchMe()
+  }
+  if(to.meta.admin){
+    if(!user||user.roleCode!=='admin')return {name:'home'}
+    return true
+  }
+  if(to.meta.auth&&!user)return {name:'login',query:{redirect:to.fullPath}}
+  if(to.meta.perms&&user&&!hasPerms(user,to.meta.perms))return {name:'home'}
+  return true
+})
 export default router
