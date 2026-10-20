@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpSession;
  */
 public class UserContext {
     public static final String SESSION_KEY = "LOGIN_USER";
+    /** Marks a public demo session; demo sessions are enforced read-only by AuthInterceptor. */
+    public static final String DEMO_SESSION_KEY = "LL_DEMO_READ_ONLY";
     /** AuthInterceptor 每次请求实时识别后写入的身份 */
     public static final String IDENTITY_KEY = "LL_IDENTITY";
 

@@ -17,6 +17,19 @@
             <div class="tip">首次使用？请切换到“注册”创建账号。</div>
           </a-form>
 
+          <section v-if="!twofa" class="demo-panel" aria-label="演示账号">
+            <div class="demo-title">快速体验演示账号</div>
+            <p class="demo-description">以下公共演示账号仅支持只读浏览，不可下单、修改资料或访问运营后台数据。</p>
+            <div class="demo-actions">
+              <a-button :disabled="loading" @click="enterDemo('buyer')">进入采购方演示</a-button>
+              <a-button :disabled="loading" @click="enterDemo('merchant')">进入商户演示</a-button>
+            </div>
+            <div class="demo-credentials">
+              采购方：18800000991 / Demo123!<br>
+              商户：18800000992 / Demo123!
+            </div>
+          </section>
+
           <!-- 第二步：两步验证动态码 -->
           <a-form v-else :model="twofa" layout="vertical" @finish="submit2fa">
             <a-alert type="info" show-icon class="twofa-tip">
@@ -136,6 +149,18 @@ async function submit() {
   } finally { loading.value = false }
 }
 
+function enterDemo(roleCode) {
+  const accounts = {
+    buyer: { phone: '18800000991', password: 'Demo123!' },
+    merchant: { phone: '18800000992', password: 'Demo123!' }
+  }
+  const account = accounts[roleCode]
+  if (!account) return
+  form.phone = account.phone
+  form.password = account.password
+  return submit()
+}
+
 async function submit2fa() {
   if (!/^\d{6}$/.test(twofa.value.code)) { message.warning('请填写 6 位动态验证码'); return }
   loading.value = true
@@ -167,6 +192,11 @@ async function doRegister() {
 .box { width: 420px; max-width: 100%; }
 .tip { text-align: center; margin-top: 12px; color: var(--ll-gray2); }
 .twofa-tip { margin-bottom: 16px; }
+.demo-panel { margin-top: 18px; padding: 14px; border: 1px solid #dce4ed; border-radius: 12px; background: #f8fafc; }
+.demo-title { font-weight: 700; color: #19324d; font-size: 14px; }
+.demo-description { margin: 6px 0 10px; font-size: 12px; line-height: 1.55; color: #64748b; }
+.demo-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.demo-credentials { margin-top: 9px; font-size: 11px; line-height: 1.7; color: #64748b; overflow-wrap: anywhere; }
 .code-row { display: flex; gap: 8px; }
 .code-row :deep(.ant-input-affix-wrapper), .code-row :deep(.ant-input) { flex: 1; }
 .strength { display: flex; align-items: center; gap: 8px; margin-top: 8px; }

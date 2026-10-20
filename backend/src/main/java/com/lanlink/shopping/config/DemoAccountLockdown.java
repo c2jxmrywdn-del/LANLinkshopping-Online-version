@@ -39,24 +39,21 @@ public class DemoAccountLockdown implements CommandLineRunner {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final boolean demoAccountsEnabled;
     private final boolean demoDataEnabled;
 
     public DemoAccountLockdown(
             UserMapper userMapper,
             PasswordEncoder passwordEncoder,
-            @Value("${app.demo.accounts.enabled:false}") boolean demoAccountsEnabled,
             @Value("${lanlink.demo-data.enabled:false}") boolean demoDataEnabled) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.demoAccountsEnabled = demoAccountsEnabled;
         this.demoDataEnabled = demoDataEnabled;
     }
 
     @Override
     public void run(String... args) {
-        if (demoAccountsEnabled || demoDataEnabled) {
-            log.warn("Demo-account lockdown skipped because a demo feature is enabled");
+        if (demoDataEnabled) {
+            log.warn("Demo-account lockdown skipped because full demo data is enabled");
             return;
         }
         int locked = 0;

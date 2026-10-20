@@ -4,6 +4,7 @@ import com.lanlink.shopping.common.BusinessException;
 import com.lanlink.shopping.common.R;
 import com.lanlink.shopping.common.UserIdentity;
 import com.lanlink.shopping.config.UserContext;
+import com.lanlink.shopping.config.DemoAccountSeeder;
 import com.lanlink.shopping.dto.Login2FADTO;
 import com.lanlink.shopping.dto.LoginDTO;
 import com.lanlink.shopping.dto.ProfileUpdateDTO;
@@ -79,6 +80,8 @@ public class AuthController {
                 return R.ok(out);
             }
             request.getSession().setAttribute(UserContext.SESSION_KEY, u);
+        setDemoReadOnlyFlag(request, u);
+            setDemoReadOnlyFlag(request, u);
             loginLogService.record(u.getUserId(), dto.getPhone(), true, "登录成功", request);
             auditService.record(u.getUserId(), "IDENTITY_RECOGNIZE",
                     "登录，身份: " + identityService.identify(u.getUserId(), u.getRoleId()).getCode(), request);
@@ -109,6 +112,14 @@ public class AuthController {
         auditService.record(userId, "IDENTITY_RECOGNIZE",
                 "登录，身份: " + identityService.identify(userId, u.getRoleId()).getCode(), request);
         return R.ok("登录成功", toView(u, request));
+    }
+
+    private void setDemoReadOnlyFlag(HttpServletRequest request, User user) {
+        if (DemoAccountSeeder.isDemoUser(user)) {
+            request.getSession().setAttribute(UserContext.DEMO_SESSION_KEY, Boolean.TRUE);
+        } else {
+            request.getSession().removeAttribute(UserContext.DEMO_SESSION_KEY);
+        }
     }
 
     private String maskPhone(String p) {

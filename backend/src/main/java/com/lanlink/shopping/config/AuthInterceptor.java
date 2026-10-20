@@ -43,6 +43,26 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // Public demo accounts may browse but must never mutate production data.
+        if (isDemoReadOnlySession(request)) {
+            // Permit a real login to replace the demo session and permit logout.
+            if (uri.startsWith("/auth/login") || uri.equals("/auth/logout")) {
+                return true;
+            }
+            if (uri.startsWith("/admin/") || uri.contains("/admin/")) {
+                write(response, R.fail(403, "公共演示账号不能访问运营后台数据"));
+                return false;
+            }
+            String method = request.getMethod();
+            boolean readOnlyMethod = "GET".equalsIgnoreCase(method)
+                    || "HEAD".equalsIgnoreCase(method)
+                    || "OPTIONS".equalsIgnoreCase(method);
+            if (!readOnlyMethod) {
+                write(response, R.fail(403, "演示账号仅允许只读浏览，不能执行真实业务操作"));
+                return false;
+            }
+        }
+
         // 实时身份识别（每次请求现场计算，保证准确性与实时性；身份变更无需重新登录即平滑切换）
         UserIdentity identity = identityService.identify(request);
         request.setAttribute(UserContext.IDENTITY_KEY, identity);
@@ -64,6 +84,11 @@ public class AuthInterceptor implements HandlerInterceptor {
             }
         }
         return true;
+    }
+
+    private boolean isDemoReadOnlySession(HttpServletRequest request) {
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        return session != null && Boolean.TRUE.equals(session.getAttribute(UserContext.DEMO_SESSION_KEY));
     }
 
     private boolean isPublicHealthCheck(String uri) {
