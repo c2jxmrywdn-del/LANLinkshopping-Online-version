@@ -92,8 +92,8 @@
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { orderApi, paymentApi, userApi, membershipApi, walletApi, creditTermApi } from '../api'
+import { message, Modal } from 'ant-design-vue'
+import { orderApi, userApi, membershipApi, walletApi, creditTermApi } from '../api'
 import { useCartStore } from '../store/cart'
 import { useUserStore } from '../store/user'
 import PaymentMethodModal from '../components/payment/PaymentMethodModal.vue'
