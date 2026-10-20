@@ -37,6 +37,7 @@ public class ActivityService {
         LocalDateTime now = LocalDateTime.now();
         List<Activity> acts = activityMapper.selectList(Wrappers.<Activity>lambdaQuery()
                 .eq(Activity::getStatus, 1)
+                .and(w -> w.isNull(Activity::getStartTime).or().le(Activity::getStartTime, now))
                 .and(w -> w.isNull(Activity::getEndTime).or().ge(Activity::getEndTime, now))
                 .orderByDesc(Activity::getActivityId));
         return acts.stream().map(a -> {
@@ -62,6 +63,12 @@ public class ActivityService {
         Activity a = activityMapper.selectById(activityId);
         if (a == null) throw new BusinessException("活动不存在");
         if (a.getStatus() == null || a.getStatus() != 1) throw new BusinessException("活动未在进行中");
+        if (a.getStartTime() != null && a.getStartTime().isAfter(LocalDateTime.now()))
+            throw new BusinessException("活动尚未开始");
+        if (a.getEndTime() != null && a.getEndTime().isBefore(LocalDateTime.now()))
+            throw new BusinessException("活动已结束");
+        if (!"register".equalsIgnoreCase(a.getType()))
+            throw new BusinessException("消费有礼活动将在符合条件的订单支付完成后自动参与");
         if (participantMapper.selectCount(Wrappers.<ActivityParticipant>lambdaQuery()
                 .eq(ActivityParticipant::getActivityId, activityId)
                 .eq(ActivityParticipant::getUserId, userId)) > 0) {
@@ -92,6 +99,7 @@ public class ActivityService {
         List<Activity> purchaseActs = activityMapper.selectList(Wrappers.<Activity>lambdaQuery()
                 .eq(Activity::getType, "purchase")
                 .eq(Activity::getStatus, 1)
+                .and(w -> w.isNull(Activity::getStartTime).or().le(Activity::getStartTime, now))
                 .and(w -> w.isNull(Activity::getEndTime).or().ge(Activity::getEndTime, now)));
         for (Activity a : purchaseActs) {
             boolean joined = participantMapper.selectCount(Wrappers.<ActivityParticipant>lambdaQuery()
