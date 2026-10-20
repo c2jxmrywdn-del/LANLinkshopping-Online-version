@@ -1,9 +1,12 @@
 package com.lanlink.shopping.payment.wallet.controller;
 
+import com.lanlink.shopping.common.BusinessException;
 import com.lanlink.shopping.common.R;
 import com.lanlink.shopping.config.UserContext;
+import com.lanlink.shopping.payment.PaymentProperties;
 import com.lanlink.shopping.payment.wallet.service.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -27,9 +30,11 @@ import java.util.Map;
 public class WalletController {
 
     private final WalletService walletService;
+    private final PaymentProperties paymentProperties;
 
-    public WalletController(WalletService walletService) {
+    public WalletController(WalletService walletService, PaymentProperties paymentProperties) {
         this.walletService = walletService;
+        this.paymentProperties = paymentProperties;
     }
 
     @GetMapping("/my")
@@ -38,7 +43,10 @@ public class WalletController {
     }
 
     @PostMapping("/recharge")
-    public R<Map<String, Object>> recharge(@RequestBody RechargeDTO dto, HttpServletRequest request) {
+    public R<Map<String, Object>> recharge(@Valid @RequestBody RechargeDTO dto, HttpServletRequest request) {
+        if (!paymentProperties.isMock()) {
+            throw new BusinessException("生产环境未接入真实充值渠道，已禁用模拟钱包充值");
+        }
         walletService.recharge(UserContext.currentUserId(request), dto.getAmount(), dto.getRemark());
         return R.ok("充值成功", walletService.myView(UserContext.currentUserId(request)));
     }
