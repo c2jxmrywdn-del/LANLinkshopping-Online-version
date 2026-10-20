@@ -125,6 +125,7 @@ class PaymentFlowTest {
     @Test
     void fullRefundWalletChannelSettlesEverything() {
         when(orderMapper.selectById("NO1")).thenReturn(order(1, "wallet", new BigDecimal("100.00"), null));
+        when(orderMapper.selectOne(any())).thenReturn(order(1, "wallet", new BigDecimal("100.00"), null));
         when(walletService.refundToWallet(eq(2L), eq(new BigDecimal("100.00")), eq("NO1"), anyString()))
                 .thenReturn(wl(20L));
 
@@ -157,6 +158,7 @@ class PaymentFlowTest {
     @Test
     void refundRejectsUnpaidOrder() {
         when(orderMapper.selectById("NO1")).thenReturn(order(0, null, new BigDecimal("10.00"), null));
+        when(orderMapper.selectOne(any())).thenReturn(order(0, null, new BigDecimal("10.00"), null));
         RefundRequest req = new RefundRequest();
         req.setOrderNo("NO1");
         assertThrows(BusinessException.class, () -> service.refund(req, 3L));
@@ -167,6 +169,7 @@ class PaymentFlowTest {
     void refundRejectsTwiceFullRefund() {
         // 已全额退款（refund_status=success 由 applyRefundResult 写入，这里模拟 refundAmount 已达总额）
         when(orderMapper.selectById("NO1")).thenReturn(order(1, "wallet", new BigDecimal("100.00"), new BigDecimal("100.00")));
+        when(orderMapper.selectOne(any())).thenReturn(order(1, "wallet", new BigDecimal("100.00"), new BigDecimal("100.00")));
         RefundRequest req = new RefundRequest();
         req.setOrderNo("NO1");
         assertThrows(BusinessException.class, () -> service.refund(req, 3L));
