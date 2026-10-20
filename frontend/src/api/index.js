@@ -99,6 +99,8 @@ export const orderApi = {
   detail: (orderNo) => request.get(`/order/detail/${orderNo}`),
   pay: (orderNo) => request.post(`/order/pay/${orderNo}`),
   cancel: (orderNo) => request.post(`/order/cancel/${orderNo}`),
+  adminShip: (orderNo) => request.post(`/order/admin/ship/${orderNo}`),
+  confirmReceived: (orderNo) => request.post(`/order/confirm-received/${orderNo}`),
   // 管理后台：订单分页（交易管理，可按支付状态过滤）
   adminList: (params) => request.get('/order/admin/list', { params })
 }

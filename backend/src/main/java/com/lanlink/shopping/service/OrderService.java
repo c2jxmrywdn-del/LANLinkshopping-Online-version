@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -319,6 +320,52 @@ public class OrderService {
                 Wrappers.<Order>lambdaQuery()
                         .eq(payStatus != null, Order::getPayStatus, payStatus)
                         .orderByDesc(Order::getCreateTime));
+    }
+
+    /**
+     * Platform fulfillment transition. The conditional mapper update prevents two
+     * concurrent admin requests from advancing the same order or sending duplicate notices.
+     */
+    @Transactional
+    public Order markShipped(String orderNo, Long adminId) {
+        Order order = orderMapper.selectById(orderNo);
+        if (order == null) throw new BusinessException("订单不存在");
+        if (!Integer.valueOf(1).equals(order.getPayStatus()))
+            throw new BusinessException("订单尚未完成支付或账期确认，不能标记发货");
+        if (!Integer.valueOf(0).equals(order.getOrderStatus()))
+            throw new BusinessException("只有待发货订单可以标记发货");
+
+        if (orderMapper.transitionOrderStatus(orderNo, 0, 1) != 1)
+            throw new BusinessException("订单状态已变化，请刷新后重试");
+
+        order.setOrderStatus(1);
+        order.setUpdateTime(LocalDateTime.now());
+        messageService.send(order.getUserId(), "order", "订单已发货",
+                "订单 " + orderNo + " 已由平台标记发货。收到商品后，请在订单详情确认收货。", orderNo);
+        auditService.record(adminId, "ORDER_SHIPPED", "平台运营标记订单已发货: " + orderNo, null);
+        return order;
+    }
+
+    /** Buyer confirms receipt; only the owner can complete a shipped order. */
+    @Transactional
+    public Order confirmReceived(Long userId, String orderNo) {
+        Order order = orderMapper.selectById(orderNo);
+        if (order == null || !Objects.equals(order.getUserId(), userId))
+            throw new BusinessException("订单不存在");
+        if (!Integer.valueOf(1).equals(order.getOrderStatus()))
+            throw new BusinessException("只有已发货订单可以确认收货");
+        if (!Integer.valueOf(1).equals(order.getPayStatus()))
+            throw new BusinessException("订单尚未完成支付，不能确认收货");
+
+        if (orderMapper.transitionOrderStatus(orderNo, 1, 2) != 1)
+            throw new BusinessException("订单状态已变化，请刷新后重试");
+
+        order.setOrderStatus(2);
+        order.setUpdateTime(LocalDateTime.now());
+        messageService.send(userId, "order", "订单已完成",
+                "订单 " + orderNo + " 已确认收货，交易流程已完成。", orderNo);
+        auditService.record(userId, "ORDER_COMPLETED", "采购方确认收货: " + orderNo, null);
+        return order;
     }
 
     private String genOrderNo() {

@@ -13,6 +13,7 @@
             <div class="status-actions">
               <a-button v-if="canPay" type="primary" size="large" @click="openPay">立即支付</a-button>
               <a-button v-if="canCancel" size="large" @click="cancel">取消订单</a-button>
+              <a-button v-if="canConfirmReceived" type="primary" size="large" @click="confirmReceived">确认收货</a-button>
             </div>
           </div>
           <a-steps :current="stepIndex" size="small" responsive class="steps">
@@ -82,7 +83,7 @@
 
 <script setup>
 import {ref,computed,watch} from 'vue'
-import {message} from 'ant-design-vue'
+import {message,Modal} from 'ant-design-vue'
 import {useRoute,useRouter} from 'vue-router'
 import {orderApi} from '../api'
 import PaymentMethodModal from '../components/payment/PaymentMethodModal.vue'
@@ -92,6 +93,7 @@ const payType={corporate:'在线支付订单',balance:'企业钱包',term:'账�
 const channelText={wallet:'钱包',mock:'模拟网关',wechat:'微信支付',alipay:'支付宝'}
 const canPay=computed(()=>{const o=detail.value?.order;return o&&o.payStatus===0&&o.orderStatus===0&&o.payType!=='term'})
 const canCancel=computed(()=>{const o=detail.value?.order;return o&&o.orderStatus===0&&(o.payStatus===0||o.payType==='term')})
+const canConfirmReceived=computed(()=>{const o=detail.value?.order;return o&&o.orderStatus===1&&o.payStatus===1})
 const stepIndex=computed(()=>{const o=detail.value?.order;if(!o)return 0;if(o.orderStatus===3||o.orderStatus===4)return 0;if(o.orderStatus===2)return 3;if(o.orderStatus===1)return 2;return o.payStatus===1?2:0})
 const fmt=v=>v?String(v).replace('T',' '):'—'
 const money=v=>Number(v||0).toFixed(2)
@@ -103,6 +105,17 @@ async function load(){loading.value=true;detail.value=null;try{detail.value=awai
 function openPay(){payOpen.value=true}
 async function paymentComplete(){payOpen.value=false;await load()}
 async function cancel(){try{await orderApi.cancel(route.params.orderNo);message.success('订单已取消');await load()}catch(e){}}
+function confirmReceived(){
+  Modal.confirm({
+    title:'确认收货？',
+    content:'请确认已收到本订单商品。确认后订单将标记为已完成。',
+    okText:'确认收货',
+    cancelText:'再检查',
+    onOk:async()=>{
+      try{await orderApi.confirmReceived(route.params.orderNo);message.success('确认收货成功');await load()}catch(e){}
+    }
+  })
+}
 watch(()=>route.params.orderNo,load,{immediate:true})
 </script>
 

@@ -46,6 +46,20 @@ public class OrderController {
         return R.ok(orderService.adminOrders(page, size, payStatus));
     }
 
+    /** Platform operations: mark a paid order as shipped. Tracking-number entry is not yet supported. */
+    @PostMapping("/admin/ship/{orderNo}")
+    @RequirePerm("admin:all")
+    public R<Order> markShipped(@PathVariable String orderNo, HttpServletRequest request) {
+        return R.ok("订单已标记发货", orderService.markShipped(orderNo, UserContext.currentUserId(request)));
+    }
+
+    /** Buyer-only order completion; ownership is checked again in the service layer. */
+    @PostMapping("/confirm-received/{orderNo}")
+    @RequirePerm("order:view")
+    public R<Order> confirmReceived(@PathVariable String orderNo, HttpServletRequest request) {
+        return R.ok("确认收货成功", orderService.confirmReceived(UserContext.currentUserId(request), orderNo));
+    }
+
     @GetMapping("/detail/{orderNo}")
     public R<OrderDetailVO> detail(@PathVariable String orderNo, HttpServletRequest request) {
         var u = UserContext.current(request);

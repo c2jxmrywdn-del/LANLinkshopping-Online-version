@@ -34,6 +34,10 @@
         <template v-else-if="column.key === 'time'">{{ (record.payTime || record.createTime || '').replace('T', ' ') }}</template>
         <template v-else-if="column.key === 'op'">
           <a-button size="small" @click="$router.push('/admin/payments/' + record.orderNo)">详情</a-button>
+          <a-button v-if="record.payStatus === 1 && record.orderStatus === 0"
+                    size="small" type="primary"
+                    :loading="shippingOrder === record.orderNo"
+                    @click="markShipped(record)">标记已发货</a-button>
           <a-button v-if="record.payType !== 'term' && record.payStatus === 1 && record.refundStatus !== 'success'"
                     size="small" danger @click="openRefund(record)">退款</a-button>
           <a-tag v-else-if="record.payType === 'term' && record.refundStatus !== 'success'" color="orange">需账期冲销流程</a-tag>
@@ -66,7 +70,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { orderApi, paymentApi } from '../../api'
 
 const rows = ref([])
@@ -81,6 +85,7 @@ const refunding = ref(false)
 const current = ref(null)
 const refundAmount = ref(null)
 const refundReason = ref('')
+const shippingOrder = ref('')
 
 const payText = { 0: '未支付', 1: '已支付', 2: '已退款' }
 const payColor = { 0: 'orange', 1: 'green', 2: 'purple' }
@@ -97,7 +102,7 @@ const cols = [
   { title: '订单状态', key: 'status', width: 100 },
   { title: '退款', key: 'refund', width: 150 },
   { title: '支付/下单时间', key: 'time', width: 165 },
-  { title: '操作', key: 'op', width: 90 }
+  { title: '操作', key: 'op', width: 245 }
 ]
 
 const pager = computed(() => ({
@@ -124,6 +129,24 @@ async function load(p = 1) {
 }
 
 function onPage(p) { load(p.current) }
+
+function markShipped(record) {
+  Modal.confirm({
+    title: '确认标记已发货？',
+    content: '此操作会更新平台订单状态并通知采购方。当前页面尚未登记物流公司与运单号，请仅在已实际发货后操作。',
+    okText: '确认已发货',
+    cancelText: '再检查',
+    onOk: async () => {
+      shippingOrder.value = record.orderNo
+      try {
+        await orderApi.adminShip(record.orderNo)
+        message.success('订单已标记发货')
+        await load(page.value)
+      } catch (e) { /* 拦截器已提示 */ }
+      finally { shippingOrder.value = '' }
+    }
+  })
+}
 
 function openRefund(record) {
   current.value = record

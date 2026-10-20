@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="eyebrow">ORDER CENTER</div><h2>我的订单</h2><p class="sub">查看订单状态、支付进度与履约信息。</p><div class="order-tabs"><a-radio-group v-model:value="filter" button-style="solid"><a-radio-button value="all">全部</a-radio-button><a-radio-button value="unpaid">待支付</a-radio-button><a-radio-button value="paid">已支付</a-radio-button><a-radio-button value="done">已完成</a-radio-button><a-radio-button value="closed">已关闭</a-radio-button></a-radio-group></div>
+    <div class="eyebrow">ORDER CENTER</div><h2>我的订单</h2><p class="sub">查看订单状态、支付进度与履约信息。</p><div class="order-tabs"><a-radio-group v-model:value="filter" button-style="solid"><a-radio-button value="all">全部</a-radio-button><a-radio-button value="unpaid">待支付</a-radio-button><a-radio-button value="paid">已支付 / 账期已开单</a-radio-button><a-radio-button value="done">已完成</a-radio-button><a-radio-button value="closed">已关闭</a-radio-button></a-radio-group></div>
     <a-table :data-source="filteredOrders" :columns="cols" row-key="orderNo" :loading="loading">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'total'">¥{{ record.totalAmount }}</template>
         <template v-else-if="column.key === 'payType'">{{ payTypeText[record.payType] || record.payType || '—' }}</template>
         <template v-else-if="column.key === 'pay'">
           <a-tag :color="record.payStatus === 1 ? 'green' : (record.payStatus === 2 ? 'purple' : 'orange')">
-            {{ record.payStatus === 1 ? '已支付' : (record.payStatus === 2 ? '已退款' : '未支付') }}
+            {{ record.payStatus === 1 ? (record.payType === 'term' ? '账期已开单' : '已支付') : (record.payStatus === 2 ? '已退款' : '未支付') }}
           </a-tag>
           <div v-if="record.payChannel" class="ch">{{ channelText[record.payChannel] || record.payChannel }}</div>
         </template>
@@ -28,53 +28,22 @@
       <a-button type="primary" @click="$router.push('/mall')">去下单</a-button>
     </a-empty>
 
-    <!-- 支付渠道选择弹窗 -->
-    <a-modal v-model:open="payOpen" :title="`订单支付 · ${current?.orderNo}`" :footer="null">
-      <div class="pay-amount">应付 <b>¥{{ current?.totalAmount }}</b></div>
-      <div class="pay-list">
-        <!-- 钱包余额支付 -->
-        <div class="pay-item" :class="{ disabled: walletInsufficient }" @click="payWith('wallet')">
-          <div class="pay-main">
-            <div class="pay-name">💰 钱包余额</div>
-            <div class="pay-sub">可用 ¥{{ walletBalance.toFixed(2) }}
-              <span v-if="walletInsufficient" class="pay-warn">（余额不足，<a @click.stop="$router.push('/wallet'); payOpen = false">去充值</a>）</span>
-            </div>
-          </div>
-          <a-tag v-if="walletInsufficient" color="red">不足</a-tag>
-          <a-tag v-else color="blue">推荐</a-tag>
-        </div>
-        <!-- 模拟渠道（mock 模式默认） -->
-        <div class="pay-item" @click="payWith('mock')">
-          <div class="pay-main">
-            <div class="pay-name">🧪 模拟网关</div>
-            <div class="pay-sub">演示环境模拟支付，即时到账</div>
-          </div>
-        </div>
-        <!-- 真实渠道（未配置凭证时禁用提示） -->
-        <div class="pay-item disabled" @click="realChannelTip('微信')">
-          <div class="pay-main">
-            <div class="pay-name">💚 微信支付</div>
-            <div class="pay-sub">扫码支付（需配置商户凭证后启用）</div>
-          </div>
-          <a-tag>未启用</a-tag>
-        </div>
-        <div class="pay-item disabled" @click="realChannelTip('支付宝')">
-          <div class="pay-main">
-            <div class="pay-name">💙 支付宝</div>
-            <div class="pay-sub">电脑网站支付（需配置应用凭证后启用）</div>
-          </div>
-          <a-tag>未启用</a-tag>
-        </div>
-      </div>
-      <div class="pay-note">支付遇到问题？可前往「我的钱包」充值后使用余额支付。</div>
-    </a-modal>
+    <!-- All orders use the same server-configured payment channel dialog. -->
+    <PaymentMethodModal
+      :open="payOpen"
+      :order-no="current?.orderNo || ''"
+      :amount="Number(current?.totalAmount || 0)"
+      @close="payOpen = false"
+      @paid="paymentComplete"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { orderApi, paymentApi, walletApi } from '../api'
+import { orderApi } from '../api'
+import PaymentMethodModal from '../components/payment/PaymentMethodModal.vue'
 import { useUserStore } from '../store/user'
 
 const user = useUserStore()
@@ -97,9 +66,6 @@ const cols = [
 // ===== 支付弹窗 =====
 const payOpen = ref(false)
 const current = ref(null)
-const walletBalance = ref(0)
-const walletInsufficient = computed(() =>
-  !current.value || walletBalance.value < Number(current.value.totalAmount || 0))
 
 async function load() {
   loading.value = true
@@ -107,37 +73,15 @@ async function load() {
   finally { loading.value = false }
 }
 
-async function openPay(record) {
+function openPay(record) {
   current.value = record
   payOpen.value = true
-  try {
-    const w = await walletApi.my()
-    walletBalance.value = Number(w?.balance || 0)
-  } catch (e) { walletBalance.value = 0 }
 }
 
-async function payWith(channel) {
-  if (channel === 'wallet' && walletInsufficient.value) {
-    message.warning('钱包余额不足，请先充值'); return
-  }
-  try {
-    if (channel === 'wallet') {
-      const vo = await paymentApi.create(current.value.orderNo, 'wallet')
-      if (vo?.payInfo?.paid) message.success(`支付成功，钱包余额 ¥${Number(vo.payInfo.balance).toFixed(2)}`)
-    } else {
-      // mock 渠道：create 生成模拟令牌后确认支付
-      const vo = await paymentApi.create(current.value.orderNo, 'mock')
-      if (vo?.mock) await paymentApi.mockConfirm(current.value.orderNo)
-      message.success('支付成功')
-    }
-    payOpen.value = false
-    user.fetchMe()
-    await load()
-  } catch (e) { /* 拦截器已提示 */ }
-}
-
-function realChannelTip(name) {
-  message.info(`${name}支付需在服务端配置商户凭证后启用，当前演示环境默认走模拟渠道`)
+async function paymentComplete() {
+  payOpen.value = false
+  await user.fetchMe()
+  await load()
 }
 
 async function cancel(r) { await orderApi.cancel(r.orderNo); message.success('已取消'); load() }
