@@ -34,11 +34,16 @@ function bootstrapLogged() {
 }
 
 watch(() => user.logged, (v) => { if (v) bootstrapLogged() })
-onMounted(() => {
+onMounted(async () => {
   // 首次进入及每次刷新均播放完整启动过渡。
   // 启动动画自身控制约 5s 的节奏，完成后再进入工作台。
   showSplash.value = true
-  if (user.logged) bootstrapLogged()
+  if (user.logged) {
+    // A local cache is only a display hint; revalidate the server session before
+    // loading account settings, unread counts, or role-specific navigation.
+    await user.fetchMe()
+    if (user.logged) bootstrapLogged()
+  }
 })
 </script>
 
