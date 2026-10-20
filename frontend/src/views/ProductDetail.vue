@@ -154,7 +154,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { productApi, trafficApi } from '../api'
@@ -181,7 +181,11 @@ function money(value) {
   return Number(value || 0).toFixed(2)
 }
 
-onMounted(async () => {
+async function loadProduct() {
+  loading.value = true
+  p.value = null
+  activeIndex.value = 0
+  qty.value = 1
   try {
     p.value = await productApi.detail(route.params.id)
     if (p.value?.merId) {
@@ -198,7 +202,8 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
-})
+}
+watch(() => [route.params.id, route.query.source, route.query.keyword], loadProduct, { immediate: true })
 
 function needLogin() {
   if (!user.logged) {
