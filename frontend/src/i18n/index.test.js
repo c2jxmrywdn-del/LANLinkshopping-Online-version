@@ -64,6 +64,24 @@ describe('轻量 i18n', () => {
     expect(document.querySelector('[data-live]').textContent).toBe('运行沙盒测试')
   })
 
+  it('首页轮播、行业入口、客服和作者元数据在英文下完整翻译', () => {
+    document.body.innerHTML = '<main><h2>建筑材料源头直供</h2><p>钢材 · 管材 · 工程材料，规格与供应能力一站核验</p><button>进入建筑专区</button><h3>建筑行业</h3><span>专区商品 →</span><p>纺织制造与面料采购</p><p>只回答专属知识库已收录的电商问题</p><p>专属客服</p><p>扫码登录</p><p>B2B 聚合型电商平台毕业设计</p><div aria-label="切换为中文"></div></main>'
+    setLocale('en-US')
+
+    expect(document.body.textContent).toContain('Building Materials Direct from Source')
+    expect(document.body.textContent).toContain('Verify steel, pipes, construction materials')
+    expect(document.body.textContent).toContain('Explore Building Materials')
+    expect(document.body.textContent).toContain('Construction & Building Materials')
+    expect(document.body.textContent).toContain('Category Products →')
+    expect(document.body.textContent).toContain('Textile Manufacturing & Fabric Procurement')
+    expect(document.body.textContent).toContain('Dedicated Support')
+    expect(document.body.textContent).toContain('Scan to Sign In')
+    expect(document.body.textContent).toContain('B2B Aggregated Commerce Graduation Project')
+    expect(document.body.innerHTML).toContain('Switch to Chinese')
+    expect(document.body.textContent).not.toContain('建筑行业')
+    expect(document.body.textContent).not.toContain('纺织制造与面料采购')
+  })
+
   it('非法语言回退中文', () => {
     setLocale('fr-FR')
     expect(t('acct.nav.profile')).toBe('个人信息')
