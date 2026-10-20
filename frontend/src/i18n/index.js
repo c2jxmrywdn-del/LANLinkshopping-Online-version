@@ -360,12 +360,276 @@ const UI_ZH_EN = {
   '行业':'Industry','行业列表':'Industry List','全部行业':'All Industries','行业数据暂时无法更新':'Industry data is temporarily unavailable','自动同步':'Auto Sync','同步中…':'Syncing…','该行业暂无细分分类':'No subcategories in this industry yet','行业已自动接入，等待商品分类配置。':'This industry is connected automatically and is waiting for category configuration.','综合商品中心':'All-Industry Product Center','覆盖平台当前全部行业采购供给。':'Covers procurement supply across all industries on the platform.','采购入口':'Procurement','热销采购':'Best-Selling Procurement','查看全平台供给':'View platform-wide supply','按销量快速筛选':'Quickly filter by sales','采购优惠':'Procurement Offers','满减与行业折扣':'Threshold discounts and industry offers','类':'categories','进入':'Enter',
   '待审核':'Pending Review','已通过':'Approved','已驳回':'Rejected','审核通过':'Approve','审核完成':'Review Completed','资质核验':'Qualification Check','提交申请':'Application Submitted','材料':'Materials','已入驻':'Onboarded','原因':'Reason','工商信息':'Business Registration','主体类型':'Entity Type','注册资本':'Registered Capital','入驻方式':'Onboarding Method','企业ID':'Enterprise ID','商户ID':'Merchant ID','纳税申报':'Tax Filing','证照材料':'Licensing Documents','申请时间':'Application Time','营业执照':'Business License','查看原件':'View Original','近期纳税记录':'Recent Tax Records','税务登记号':'Tax Registration No.','纳税记录材料':'Tax Record Documents','记录':'Record','已具备资质':'Existing Qualifications','驳回原因':'Rejection Reason','操作':'Actions','快速查看':'Quick View','档案':'Profile','通过':'Approve','驳回':'Reject','商户档案详情':'Merchant Profile Details','驳回入驻申请':'Reject Onboarding Application','驳回原因（必填，将展示给商户用于整改）':'Rejection reason (required; shown to the merchant for remediation)','请输入驳回原因':'Please enter a rejection reason','确认通过':'Confirm Approval','审核通过该商户入驻申请':'Approve this merchant onboarding application',
   '平台运营 13800000000':'Platform Ops 13800000000','采购方':'Buyer','商户/供应商':'Merchant / Supplier','注册身份':'Registration Role','邮箱（选填）':'Email (optional)','11 位手机号':'11-digit phone number','至少 8 位，含字母与数字':'At least 8 characters, including letters and numbers','两次输入的密码不一致':'The passwords do not match','密码强度不足，至少 8 位且含字母与数字':'Password is too weak; use at least 8 characters with letters and numbers','演示账号（密码均 123456）':'Demo accounts (all passwords are 123456)','演示: 13900000001':'Demo: 13900000001','演示密码: 123456':'Demo password: 123456','动态验证码':'One-Time Code','验证并登录':'Verify & Sign In','返回重新登录':'Back to Sign In','去登录':'Go to Sign In','注册账号':'Create Account','请填写 6 位动态验证码':'Enter the 6-digit one-time code','验证码错误或未获取':'Invalid or missing verification code',
-  '必要 Cookie 用于登录、会话和安全功能；可选 Cookie 用于记住偏好、分析平台使用情况及改善营销体验。':'Necessary cookies support sign-in, sessions and security; optional cookies remember preferences, analyze usage and improve marketing experiences.','你可以接受全部，也可以仅启用必要 Cookie。':'You can accept all cookies or enable only necessary cookies.','必要 Cookie 用于身份认证、会话保持、CSRF 防护和核心交易流程，无法关闭。':'Necessary cookies support authentication, sessions, CSRF protection and core transaction flows and cannot be disabled.','当前状态：尚未选择':'Current status: Not selected','当前：':'Current:','更新时间：':'Updated:','管理必要、偏好、分析和营销 Cookie。必要 Cookie 始终启用。':'Manage necessary, preference, analytics and marketing cookies. Necessary cookies are always enabled.','当前平台默认不启用第三方广告追踪':'Third-party ad tracking is disabled by default on this platform'
+  '必要 Cookie 用于登录、会话和安全功能；可选 Cookie 用于记住偏好、分析平台使用情况及改善营销体验。':'Necessary cookies support sign-in, sessions and security; optional cookies remember preferences, analyze usage and improve marketing experiences.','你可以接受全部，也可以仅启用必要 Cookie。':'You can accept all cookies or enable only necessary cookies.','必要 Cookie 用于身份认证、会话保持、CSRF 防护和核心交易流程，无法关闭。':'Necessary cookies support authentication, sessions, CSRF protection and core transaction flows and cannot be disabled.','当前状态：尚未选择':'Current status: Not selected','当前：':'Current:','更新时间：':'Updated:','管理必要、偏好、分析和营销 Cookie。必要 Cookie 始终启用。':'Manage necessary, preference, analytics and marketing cookies. Necessary cookies are always enabled.','当前平台默认不启用第三方广告追踪':'Third-party ad tracking is disabled by default on this platform',
+
+  // Supplemental translations for commerce, merchant, billing, privacy, and support views.
+  "平台管理员": "Platform Administrator",
+  "入驻商户": "Onboarded Merchant",
+  "管理后台": "Admin Console",
+  "客户沟通中心": "Customer Communication Center",
+  "沟通概览": "Communication Overview",
+  "会话工作台": "Conversation Workspace",
+  "对话学习审核": "Conversation Learning Review",
+  "学习沙盒": "Learning Sandbox",
+  "系统正在繁忙处理": "The system is busy",
+  "当前请求较多，正在为你保持连接。请稍候，无需重复操作。": "We are handling a high volume of requests and keeping your connection active. Please wait; there is no need to retry.",
+  "正在优化请求队列": "Optimizing the request queue",
+  "继续等待": "Keep Waiting",
+  "查看全部商品 →": "View All Products →",
+  "查看订单状态、支付进度与履约信息。": "View order status, payment progress, and fulfillment details.",
+  "到手价": "Final Price",
+  "登录后购买": "Sign in to Purchase",
+  "订单金额": "Order Amount",
+  "对公转账": "Corporate Bank Transfer",
+  "服务说明": "Service Information",
+  "规格参数": "Specifications",
+  "加购": "Add to Cart",
+  "价格降序": "Price: High to Low",
+  "价格升序": "Price: Low to High",
+  "进入账期账单 →": "Go to Credit Bills →",
+  "来自个人中心": "From Account Center",
+  "了解平台": "Learn About the Platform",
+  "累计销量": "Total Sales",
+  "立即支付": "Pay Now",
+  "连接商品、采购、商户与增长，让交易从发现开始，在同一个网络里持续发生。": "Connecting products, procurement, merchants, and growth—so commerce starts with discovery and continues in one network.",
+  "默认": "Default",
+  "配送": "Shipping",
+  "配送时效、运费及具体履约规则以商户页面及订单信息为准。": "Shipping times, fees, and fulfillment terms are subject to the merchant page and order details.",
+  "配送与履约": "Shipping & Fulfillment",
+  "企业钱包": "Business Wallet",
+  "全部": "All",
+  "全选": "Select All",
+  "热销推荐": "Hot Recommendations",
+  "如遇商品或订单问题，可根据平台及商户售后规则申请处理。": "For product or order issues, request assistance under the platform and merchant after-sales policies.",
+  "删除已选": "Remove Selected",
+  "商户编号": "Merchant ID",
+  "商户认证": "Merchant Verification",
+  "商品介绍": "Product Overview",
+  "商品信息以商户实际发布内容为准，订单通过平台流程完成。": "Product details are provided by the merchant. Orders are completed through the platform workflow.",
+  "售后": "After-Sales",
+  "售后服务": "After-Sales Service",
+  "售后支持": "After-Sales Support",
+  "挑选商品后再进入结算，选择状态会自动保存。": "Choose products before checkout. Your selections are saved automatically.",
+  "我的购物车": "My Cart",
+  "下单后按商户规则发货": "Orders ship according to the merchant's policies",
+  "销量优先": "Sort by Sales",
+  "行业解决方案": "Industry Solutions",
+  "已关闭": "Closed",
+  "已支付": "Paid",
+  "以商品及商户售后政策为准": "Subject to the product and merchant after-sales policies",
+  "暂时缺货": "Temporarily Out of Stock",
+  "正品保障": "Authenticity Guaranteed",
+  "正品与交易": "Authenticity & Transactions",
+  "综合排序": "Recommended Sorting",
+  "VIP 专享": "VIP Exclusive",
+  "按到期日排序，提前安排资金与还款": "Sort by due date to plan funds and repayments ahead of time",
+  "查看到期计划 →": "View Due-Date Schedule →",
+  "查看未结清、逾期及已结清账单": "View open, overdue, and settled bills",
+  "从“找到商品”到“完成交易”，再到“持续经营”，每一个角色都有对应的工作台与能力。": "From product discovery to completed transactions and ongoing operations, every role has a dedicated workspace and capabilities.",
+  "从流量来源到成交转化，一屏掌握店铺增长机会。": "Track traffic sources and conversions in one view to uncover growth opportunities.",
+  "待还金额": "Amount Due",
+  "当前生效": "Currently Active",
+  "当前授权状态": "Current Authorization Status",
+  "到期管理": "Due-Date Management",
+  "发现平台活动、领取奖励并追踪参与记录。": "Discover platform campaigns, claim rewards, and track participation.",
+  "返回商城": "Back to Mall",
+  "风险等级": "Risk Level",
+  "服务中断": "Service Interruption",
+  "个体工商户": "Sole Proprietorship",
+  "公司": "Company",
+  "管理 Cookie 偏好": "Manage Cookie Preferences",
+  "管理授信申请 →": "Manage Credit Applications →",
+  "活动闭环": "Campaign Workflow",
+  "活动广场 → 活动详情 → 参与确认 → 积分流水": "Campaign Hub → Campaign Details → Participation Confirmation → Points Ledger",
+  "加盟": "Join the Platform",
+  "简体中文": "Simplified Chinese",
+  "奖励 +100 积分": "Reward: +100 Points",
+  "交易规范": "Transaction Standards",
+  "交易网络": "Commerce Network",
+  "近 30 天": "Last 30 Days",
+  "近 7 天": "Last 7 Days",
+  "近 90 天": "Last 90 Days",
+  "可用授信": "Available Credit",
+  "进入账单中心 →": "Go to Billing Center →",
+  "平台邀约": "Platform Invitation",
+  "钱包支付实时到账 · 退款按钱包渠道入账": "Wallet payments are credited instantly; refunds are returned to the wallet",
+  "去看积分": "View Points",
+  "去选购 →": "Start Shopping →",
+  "去支付订单": "Pay for Order",
+  "全部流水": "All Transactions",
+  "商户经营数据中心": "Merchant Business Analytics",
+  "商户义务": "Merchant Responsibilities",
+  "商户应保证商品质量与证照信息真实有效，并按约定时效履约。": "Merchants must ensure product quality and valid licensing information, and fulfill orders within the agreed timeframe.",
+  "授信调整": "Credit Limit Adjustment",
+  "授信额度、账单到期、还款与对账统一管理。": "Manage credit limits, bill due dates, repayments, and reconciliation in one place.",
+  "刷新数据": "Refresh Data",
+  "说明": "Description",
+  "统一管理余额、充值与资金流水。": "Manage balance, top-ups, and transaction history in one place.",
+  "销售趋势": "Sales Trend",
+  "演示环境支持钱包、模拟、微信与支付宝渠道；真实渠道需完成对应商户配置。": "The demo supports wallet, simulated, WeChat, and Alipay payment methods. Live methods require merchant configuration.",
+  "业务规模变化后重新申请更匹配的额度": "Reapply for a credit limit that better fits your business as it grows",
+  "应付账单": "Bills Payable",
+  "用户应使用真实企业信息注册并完成身份认证，妥善保管账号、密码及两步验证凭证。": "Users must register with accurate business information, complete identity verification, and protect account credentials and two-factor authentication methods.",
+  "用于演示平台交易、账号与商户经营的基本规则。": "Basic rules for demonstrating platform transactions, accounts, and merchant operations.",
+  "优惠中心": "Offers Center",
+  "暂无正在进行的优惠活动，逛逛商城看看精选商品。": "There are no active offers right now. Browse the mall to discover featured products.",
+  "账单中心": "Billing Center",
+  "账号与实名": "Account & Identity Verification",
+  "账期管理": "Credit Terms Management",
+  "支付金额与订单走势": "Payment Amounts & Order Trends",
+  "支付与退款": "Payments & Refunds",
+  "自主入驻": "Self-Service Onboarding",
+  "审核授信、调整额度并跟踪企业账期状态。": "Review credit applications, adjust limits, and track business credit status.",
+  "当前正式客服回答（只读对照）": "Current Published Support Response (Read-Only Comparison)",
+  "导出候选 JSON": "Export Candidate JSON",
+  "订单合计": "Order Total",
+  "返回候选列表": "Back to Candidate List",
+  "返回候选详情": "Back to Candidate Details",
+  "返回会话": "Back to Conversation",
+  "返回交易管理处理退款": "Return to Transaction Management to Process Refunds",
+  "返回审核列表": "Back to Review List",
+  "管理你的收货地址，最多可保存多条，并可将任意一条设为默认。": "Manage your shipping addresses. You can save multiple addresses and set any one as the default.",
+  "候选回答预览（尚未发布）": "Candidate Response Preview (Not Published)",
+  "进入四级审核": "Open Level-Four Review",
+  "清空测试结果": "Clear Test Results",
+  "设为默认": "Set as Default",
+  "设为默认收货地址": "Set as Default Shipping Address",
+  "运行沙盒测试": "Run Sandbox Test",
+  "＋ 新增地址": "+ Add Address",
+  "导出 CSV": "Export CSV",
+  "企业账期审核": "Business Credit Review",
+  "审核驳回": "Review Rejected",
+  "未支付": "Unpaid",
+  "可售": "Available for Sale",
+  "不可售": "Unavailable for Sale",
+  "纳税材料": "Tax Documents",
+  "VIP 价": "VIP Price",
+  "商品由入驻商户发布并经平台审核；下单前请核对规格、价格与库存。": "Products are listed by onboarded merchants and reviewed by the platform. Check specifications, prices, and stock before ordering.",
+  "身份决定可见内容与操作边界；权限由前端路由与后端接口共同校验。": "Your role determines what you can view and do. Permissions are enforced by both frontend routing and backend APIs.",
+  "因系统维护、不可抗力等导致服务中断时，平台将尽快恢复服务。": "If service is interrupted by maintenance or force majeure, the platform will restore it as soon as possible.",
+  "你的数据偏好，由你决定": "Your Data Preferences, Your Choice",
+  "你可以随时修改 Cookie 偏好。撤回分析授权后，平台会同时清除本地分析会话；不会清除服务端登录会话。": "You can change cookie preferences at any time. Revoking analytics consent clears the local analytics session, but does not end your server-side login session.",
+  "LANLinkshopping 面向 B2B 场景，将商品展示、在线交易、会员营销、商户经营与平台运营 汇聚到同一套数字化交易链路中。": "LANLinkshopping brings product discovery, online transactions, membership marketing, merchant operations, and platform management together in one digital B2B commerce flow.",
+  "LANLinkshopping 为个人毕业设计项目。这里集中提供作者邮箱、社交平台与交流社区入口，便于项目展示、沟通与学术交流。": "LANLinkshopping is an individual graduation project. This page gathers the author's email, social platforms, and community links for project presentation, communication, and academic exchange.",
+  "LANLinkshopping 只在获得对应授权后启用可选的偏好、分析与营销能力。必要 Cookie 始终保持开启，以保障登录、会话、安全验证和核心交易流程。": "LANLinkshopping enables optional preference, analytics, and marketing features only with the relevant consent. Necessary cookies always remain enabled for sign-in, sessions, security verification, and core transactions.",
+  "QQ邮箱": "QQ Mail",
+  "已审核": "Reviewed",
+  "申请材料": "Application Documents",
+  "企业信息": "Business Information",
+  "提交审核": "Submit for Review",
+  "审核记录": "Review History",
+  "客户消息": "Customer Messages",
+  "内部备注": "Internal Notes",
+  "学习候选": "Learning Candidate",
+  "知识库": "Knowledge Base",
+  "候选回答": "Candidate Response",
+  "发送消息": "Send Message",
+  "客户服务": "Customer Service",
+  "客服学习": "Support Learning",
+  "客服学习沙盒": "Support Learning Sandbox",
+  "已发布": "Published",
+  "未发布": "Not Published",
+  "撤回发布": "Unpublish",
+  "发布候选": "Publish Candidate",
+  "测试输入": "Test Input",
+  "测试输出": "Test Output",
+  "运行测试": "Run Test",
+  "测试结果": "Test Results",
+  "清空": "Clear",
+  "暂无记录": "No Records",
+  "暂无消息": "No Messages",
+  "搜索商品": "Search Products",
+  "搜索订单": "Search Orders",
+  "请输入关键词": "Enter a keyword",
+  "请选择状态": "Select a status",
+  "商户资质": "Merchant Qualifications",
+  "营业资料": "Business Documents",
+  "税务资料": "Tax Documents",
+  "业务类型": "Business Type",
+  "申请进度": "Application Progress",
+  "审核状态": "Review Status",
+  "待处理": "Pending",
+  "处理中": "Processing",
+  "处理完成": "Processed",
+  "支付处理中": "Payment Processing",
+  "退款处理中": "Refund Processing",
+  "退款成功": "Refund Successful",
+  "退款失败": "Refund Failed",
+  "支付成功": "Payment Successful",
+  "支付失败": "Payment Failed",
+  "已发货": "Shipped",
+  "已收货": "Delivered",
+  "已生效": "Active",
+  "已使用": "Used",
+  "未使用": "Unused",
+  "可用": "Available",
+  "不可用": "Unavailable",
+  "生效时间": "Effective Time",
+  "失效时间": "Expiration Time",
+  "截止时间": "Deadline",
+  "剩余时间": "Time Remaining",
+  "操作时间": "Action Time",
+  "操作人": "Operator",
+  "操作记录": "Activity Log",
+  "操作说明": "Action Description",
+  "查看记录": "View Records",
+  "更多信息": "More Information",
+  "业务说明": "Business Details",
+  "账户余额": "Account Balance",
+  "钱包充值": "Wallet Top-Up",
+  "充值成功": "Top-Up Successful",
+  "充值失败": "Top-Up Failed",
+  "确认支付": "Confirm Payment",
+  "付款方式": "Payment Method",
+  "退款原因": "Refund Reason",
+  "退款金额": "Refund Amount",
+  "收款账户": "Receiving Account",
+  "付款账户": "Payer Account",
+  "账单金额": "Bill Amount",
+  "到期日期": "Due Date",
+  "已逾期": "Overdue",
+  "未结清": "Outstanding",
+  "已结清": "Settled",
+  "还款记录": "Repayment History",
+  "对账": "Reconciliation",
+  "授信额度": "Credit Limit",
+  "可用额度": "Available Limit",
+  "已用额度": "Used Limit",
+  "总额度": "Total Limit",
+  "未读消息": "Unread Messages",
+  "标记已读": "Mark as Read",
+  "回复客户": "Reply to Customer",
+  "会话详情": "Conversation Details",
+  "消息详情": "Message Details",
+  "原始消息": "Original Message",
+  "学习状态": "Learning Status",
+  "审核详情": "Review Details",
+  "审核意见": "Review Comments",
+  "通过审核": "Approve",
+  "驳回申请": "Reject Application",
+  "查看材料": "View Documents",
+  "下载材料": "Download Documents",
+  "打开原件": "Open Original",
+  "候选状态": "Candidate Status",
+  "来源会话": "Source Conversation",
+  "知识库来源": "Knowledge Base Source",
+  "引用来源": "Cited Source",
+  "无权限访问": "Access Denied",
+  "请先登录": "Please Sign In",
+  "请求失败": "Request Failed",
+  "保存失败": "Save Failed",
+  "加载失败": "Failed to Load",
+  "操作成功": "Action Successful",
+  "操作失败": "Action Failed",
+  "网络异常": "Network Error",
+  "服务暂不可用": "Service Temporarily Unavailable"
 }
 
 const _zhOrder = Object.keys(UI_ZH_EN).sort((a,b)=>b.length-a.length)
 const _nodeSources = new WeakMap()
 const _attrSources = new WeakMap()
+const _lastTranslatedNodes = new WeakMap()
+const _lastTranslatedAttrs = new WeakMap()
 let _observer = null
 let _domApplying = false
 
@@ -391,7 +655,10 @@ function _walkAndTranslate(root=document.body) {
     if(!_nodeSources.has(node)) _nodeSources.set(node,node.nodeValue)
     const source=_nodeSources.get(node)
     const next=_translateString(source,true)
-    if(next!==node.nodeValue) node.nodeValue=next
+    if(next!==node.nodeValue) {
+      _lastTranslatedNodes.set(node,next)
+      node.nodeValue=next
+    }
   }
   const attrs=['placeholder','title','aria-label','alt']
   root.querySelectorAll?.('*').forEach(el=>{
@@ -402,7 +669,12 @@ function _walkAndTranslate(root=document.body) {
       if(!cache){cache={};_attrSources.set(key,cache)}
       if(cache[attr]===undefined) cache[attr]=el.getAttribute(attr)
       const next=_translateString(cache[attr],true)
-      if(next!==el.getAttribute(attr)) el.setAttribute(attr,next)
+      if(next!==el.getAttribute(attr)) {
+        let last=_lastTranslatedAttrs.get(el)
+        if(!last){last={};_lastTranslatedAttrs.set(el,last)}
+        last[attr]=next
+        el.setAttribute(attr,next)
+      }
     }
   })
 }
@@ -446,18 +718,40 @@ function _observeDom(){
     for(const m of mutations){
       if(m.type==='characterData' && m.target){
         const node=m.target
-        if(!_nodeSources.has(node)) _nodeSources.set(node,node.nodeValue)
-        const next=_translateString(_nodeSources.get(node),true)
-        if(next!==node.nodeValue) node.nodeValue=next
+        const current=node.nodeValue ?? ''
+        const lastTranslated=_lastTranslatedNodes.get(node)
+        if(lastTranslated===current){
+          _lastTranslatedNodes.delete(node)
+          continue
+        }
+        // Vue may reuse a text node for a different route or API response. Capture the new
+        // Chinese source instead of replaying stale text from a prior render.
+        if(/[\u4e00-\u9fff]/.test(current)) _nodeSources.set(node,current)
+        else if(!_nodeSources.has(node)) _nodeSources.set(node,current)
+        const source=_nodeSources.get(node)
+        const next=_translateString(source,true)
+        if(next!==current){
+          _lastTranslatedNodes.set(node,next)
+          node.nodeValue=next
+        }
       } else if(m.type==='childList'){
         m.addedNodes.forEach(n=>{ if(n.nodeType===Node.ELEMENT_NODE) _walkAndTranslate(n); else if(n.nodeType===Node.TEXT_NODE && n.nodeValue?.trim()){_nodeSources.set(n,n.nodeValue);n.nodeValue=_translateString(n.nodeValue,true)} })
       } else if(m.type==='attributes'){
         const el=m.target
         const attr=m.attributeName
         if(['placeholder','title','aria-label','alt'].includes(attr)){
-          let cache=_attrSources.get(el); if(!cache){cache={};_attrSources.set(el,cache)}
-          if(cache[attr]===undefined) cache[attr]=el.getAttribute(attr)
-          el.setAttribute(attr,_translateString(cache[attr],true))
+          const current=el.getAttribute(attr) ?? ''
+          let last=_lastTranslatedAttrs.get(el)
+          if(last && last[attr]===current){ delete last[attr]; continue }
+          let cache=_attrSources.get(el)
+          if(!cache){cache={};_attrSources.set(el,cache)}
+          if(/[\u4e00-\u9fff]/.test(current) || cache[attr]===undefined) cache[attr]=current
+          const next=_translateString(cache[attr],true)
+          if(next!==current){
+            if(!last){last={};_lastTranslatedAttrs.set(el,last)}
+            last[attr]=next
+            el.setAttribute(attr,next)
+          }
         }
       }
     }
