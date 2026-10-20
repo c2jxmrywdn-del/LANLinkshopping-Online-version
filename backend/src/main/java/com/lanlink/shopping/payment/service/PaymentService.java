@@ -263,6 +263,9 @@ public class PaymentService {
                 .last("LIMIT 1 FOR UPDATE"));
         if (o == null) throw new BusinessException("订单不存在");
         if (!isPaid(o)) throw new BusinessException("未支付订单不可退款");
+        if ("term".equalsIgnoreCase(o.getPayType())) {
+            throw new BusinessException("账期订单不能使用普通原路退款。未履约订单请先取消；已产生还款的账单需走账期冲销流程");
+        }
         if ("success".equals(o.getRefundStatus())) throw new BusinessException("该订单已全额退款");
         BigDecimal already = o.getRefundAmount() == null ? BigDecimal.ZERO : o.getRefundAmount();
         BigDecimal remain = o.getTotalAmount().subtract(already);
