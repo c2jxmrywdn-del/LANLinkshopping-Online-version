@@ -80,7 +80,6 @@ public class AuthController {
                 return R.ok(out);
             }
             request.getSession().setAttribute(UserContext.SESSION_KEY, u);
-        setDemoReadOnlyFlag(request, u);
             setDemoReadOnlyFlag(request, u);
             loginLogService.record(u.getUserId(), dto.getPhone(), true, "登录成功", request);
             auditService.record(u.getUserId(), "IDENTITY_RECOGNIZE",
