@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { t, setLocale } from './index'
 
 describe('轻量 i18n', () => {
-  beforeEach(() => setLocale('zh-CN'))
+  beforeEach(() => {
+    document.body.innerHTML = ''
+    setLocale('zh-CN')
+  })
 
   it('中文取值', () => {
     expect(t('acct.nav.profile')).toBe('个人信息')
@@ -36,6 +39,29 @@ describe('轻量 i18n', () => {
     expect(document.body.textContent).toContain('税务登记号')
     expect(document.body.textContent).toContain('查看原件')
     expect(document.body.textContent).toContain('记录')
+  })
+
+  it('英文 DOM 覆盖商城、账期、隐私和客服说明', async () => {
+    document.body.innerHTML = '<main><p>查看全部商品 →</p><p>配送与履约</p><p>按到期日排序，提前安排资金与还款</p><p>运行沙盒测试</p><p>LANLinkshopping 为个人毕业设计项目。这里集中提供作者邮箱、社交平台与交流社区入口，便于项目展示、沟通与学术交流。</p><p data-live>当前正式客服回答（只读对照）</p></main>'
+    setLocale('en-US')
+
+    expect(document.body.textContent).toContain('View All Products →')
+    expect(document.body.textContent).toContain('Shipping & Fulfillment')
+    expect(document.body.textContent).toContain('Sort by due date to plan funds and repayments ahead of time')
+    expect(document.body.textContent).toContain('Run Sandbox Test')
+    expect(document.body.textContent).toContain('individual graduation project')
+    expect(document.body.textContent).toContain('Current Published Support Response (Read-Only Comparison)')
+    expect(document.body.textContent).not.toContain('查看全部商品')
+
+    const liveText = document.querySelector('[data-live]').firstChild
+    liveText.nodeValue = '运行沙盒测试'
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(document.querySelector('[data-live]').textContent).toBe('Run Sandbox Test')
+
+    setLocale('zh-CN')
+    expect(document.body.textContent).toContain('查看全部商品 →')
+    expect(document.body.textContent).toContain('配送与履约')
+    expect(document.querySelector('[data-live]').textContent).toBe('运行沙盒测试')
   })
 
   it('非法语言回退中文', () => {
