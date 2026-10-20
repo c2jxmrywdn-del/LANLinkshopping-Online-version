@@ -63,6 +63,18 @@ class ActivityServiceTest {
     }
 
     @Test
+    void purchaseActivityCannotBeJoinedManually() {
+        when(activityMapper.selectById(1L)).thenReturn(activity(1L, "purchase", 1));
+        when(participantMapper.selectCount(any())).thenReturn(0L);
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.join(2L, 1L));
+
+        assertTrue(ex.getMessage().contains("订单支付完成后自动参与"));
+        verify(participantMapper, never()).insert(any(ActivityParticipant.class));
+        verify(membershipService, never()).awardPoints(any(), any(), any(), any());
+    }
+
+    @Test
     void joinRejectedWhenNotOngoing() {
         when(activityMapper.selectById(1L)).thenReturn(activity(1L, "register", 2)); // 已结束
         when(participantMapper.selectCount(any())).thenReturn(0L);
