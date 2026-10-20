@@ -71,7 +71,7 @@ class ActivityServiceTest {
 
         assertTrue(ex.getMessage().contains("订单支付完成后自动参与"));
         verify(participantMapper, never()).insert(any(ActivityParticipant.class));
-        verify(membershipService, never()).awardPoints(any(), any(), any(), any());
+        verifyNoInteractions(membershipService);
     }
 
     @Test
