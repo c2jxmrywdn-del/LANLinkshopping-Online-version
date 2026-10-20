@@ -727,7 +727,8 @@ function _observeDom(){
         // Vue may reuse a text node for a different route or API response. Capture the new
         // Chinese source instead of replaying stale text from a prior render.
         if(/[\u4e00-\u9fff]/.test(current)) _nodeSources.set(node,current)
-        else if(!_nodeSources.has(node)) _nodeSources.set(node,current)
+        // Capture the exact new value whenever Vue changes a node, so stale Chinese text is never replayed.
+        _nodeSources.set(node,current)
         const source=_nodeSources.get(node)
         const next=_translateString(source,true)
         if(next!==current){
