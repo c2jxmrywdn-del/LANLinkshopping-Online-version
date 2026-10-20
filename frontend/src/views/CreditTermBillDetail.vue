@@ -8,11 +8,12 @@
     <div class="cols">
       <a-card title="还款" :bordered="false">
         <a-alert v-if="bill.status==='PAID'" type="success" show-icon message="账单已结清" description="本账单对应授信已全部释放。"/>
-        <a-form v-else layout="vertical" @finish="repay">
+        <a-alert v-else-if="bill.status==='CANCELLED'" type="info" show-icon message="账单已取消" description="已取消账单不能继续还款。"/>
+        <a-form v-else-if="bill.status!=='CANCELLED'" layout="vertical" @finish="repay">
           <a-form-item label="还款金额"><a-input-number v-model:value="amount" :min="0.01" :max="Number(bill.outstandingAmount)" :precision="2" style="width:100%" addon-before="¥"/></a-form-item>
-          <a-form-item label="还款方式"><a-radio-group v-model:value="method"><a-radio value="wallet">企业钱包</a-radio><a-radio value="transfer">对公转账</a-radio></a-radio-group></a-form-item>
+          <a-form-item label="还款方式"><a-radio-group v-model:value="method"><a-radio value="wallet">企业钱包</a-radio><a-radio value="transfer" disabled>对公转账（待收款核验接入）</a-radio></a-radio-group></a-form-item>
           <a-button type="primary" block :loading="loading" html-type="submit">确认还款</a-button>
-          <p class="hint">演示环境会记录还款流水并同步恢复可用授信额度。</p>
+          <p class="hint">企业钱包还款会实际扣减余额并释放对应授信。对公转账在接入收款核验前暂不可用。</p>
         </a-form>
       </a-card>
       <a-card title="还款记录" :bordered="false">
