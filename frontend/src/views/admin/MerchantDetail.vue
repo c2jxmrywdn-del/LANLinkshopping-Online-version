@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { merchantApi } from '../../api'
@@ -115,6 +115,7 @@ const fmt = v => v ? String(v).replace('T',' ').slice(0,16) : '—'
 
 async function load() {
   loading.value = true
+  detail.value = null
   try { detail.value = await merchantApi.adminDetail(route.params.merId) }
   catch (e) { detail.value = null }
   finally { loading.value = false }
@@ -130,7 +131,7 @@ async function reject() {
   try { await merchantApi.adminReview(route.params.merId, 2, reason.value.trim()); message.success('已驳回'); rejectOpen.value = false; await load() }
   finally { reviewing.value = false }
 }
-onMounted(load)
+watch(() => route.params.merId, load, { immediate: true })
 </script>
 
 <style scoped>
