@@ -32,6 +32,12 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+    /** Lists only methods that are genuinely available in the current server configuration. */
+    @GetMapping("/channels")
+    public R<List<Map<String, String>>> channels() {
+        return R.ok(paymentService.availableChannels());
+    }
+
     @PostMapping("/create")
     public R<PayCreateVO> create(@Valid @RequestBody PayCreateRequest req, HttpServletRequest request) {
         return R.ok(paymentService.create(req.getOrderNo(), UserContext.currentUserId(request), req.getChannel()));
