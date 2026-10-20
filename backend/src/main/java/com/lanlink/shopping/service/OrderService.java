@@ -94,7 +94,12 @@ public class OrderService {
             if (p.getStatus() == null || p.getStatus() != 1) {
                 throw new BusinessException("商品暂不可购买(未通过审核或已下架): " + p.getTitle());
             }
-            if (p.getStock() < c.getQuantity()) throw new BusinessException("库存不足: " + p.getTitle());
+            if (c.getQuantity() == null || c.getQuantity() <= 0) {
+                throw new BusinessException("商品数量必须大于 0");
+            }
+            if (p.getStock() == null || p.getStock() < c.getQuantity()) {
+                throw new BusinessException("库存不足: " + p.getTitle());
+            }
             total = total.add(p.getPrice().multiply(BigDecimal.valueOf(c.getQuantity())));
             if (orderIndId == null) orderIndId = p.getIndId();
         }
@@ -118,6 +123,11 @@ public class OrderService {
         // 明细 + 扣库存
         for (Cart c : carts) {
             Product p = productMapper.selectById(c.getProdId());
+            if (p == null) throw new BusinessException("商品已不存在: " + c.getProdId());
+            int reserved = productMapper.reserveStock(p.getProdId(), c.getQuantity());
+            if (reserved != 1) {
+                throw new BusinessException("库存不足或商品已下架，请刷新购物车后重试: " + p.getTitle());
+            }
             BigDecimal subtotal = p.getPrice().multiply(BigDecimal.valueOf(c.getQuantity()));
             OrderItem item = new OrderItem();
             item.setOrderNo(order.getOrderNo());
@@ -128,11 +138,7 @@ public class OrderService {
             item.setSubtotal(subtotal);
             item.setCoverUrl(p.getCoverUrl());
             orderItemMapper.insert(item);
-            // 扣库存 + 加销量
-            p.setStock(p.getStock() - c.getQuantity());
-            p.setSales(p.getSales() + c.getQuantity());
-            p.setUpdateTime(LocalDateTime.now());
-            productMapper.updateById(p);
+            // 库存扣减与销量增加已由 reserveStock 的条件 UPDATE 原子完成。
             // 移除已购购物车项
             cartMapper.deleteById(c.getCartId());
         }
@@ -269,12 +275,11 @@ public class OrderService {
         List<OrderItem> items = orderItemMapper.selectList(Wrappers.<OrderItem>lambdaQuery()
                 .eq(OrderItem::getOrderNo, orderNo));
         for (OrderItem it : items) {
-            Product p = productMapper.selectById(it.getProdId());
-            if (p != null) {
-                p.setStock(p.getStock() + it.getQuantity());
-                p.setSales(Math.max(0, p.getSales() - it.getQuantity()));
-                productMapper.updateById(p);
+            if (it.getProdId() == null || it.getQuantity() == null || it.getQuantity() <= 0) {
+                throw new BusinessException("订单明细库存信息异常，无法安全恢复库存: " + orderNo);
             }
+            // 使用数据库原子算术，避免并发取消/退款覆盖其他订单的库存变动。
+            productMapper.restoreStock(it.getProdId(), it.getQuantity());
         }
     }
 
