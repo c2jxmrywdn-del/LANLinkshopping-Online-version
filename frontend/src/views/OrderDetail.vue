@@ -88,7 +88,7 @@ import {orderApi} from '../api'
 import PaymentMethodModal from '../components/payment/PaymentMethodModal.vue'
 const route=useRoute(),router=useRouter(),detail=ref(null),loading=ref(false),payOpen=ref(false)
 const statusMap={0:'待发货',1:'已发货',2:'已完成',3:'已取消',4:'已退款'}
-const payType={corporate:'对公转账',balance:'企业钱包',term:'账期/尾款'}
+const payType={corporate:'在线支付订单',balance:'企业钱包',term:'账期/尾款'}
 const channelText={wallet:'钱包',mock:'模拟网关',wechat:'微信支付',alipay:'支付宝'}
 const canPay=computed(()=>{const o=detail.value?.order;return o&&o.payStatus===0&&o.orderStatus===0&&o.payType!=='term'})
 const canCancel=computed(()=>{const o=detail.value?.order;return o&&o.orderStatus===0&&(o.payStatus===0||o.payType==='term')})
