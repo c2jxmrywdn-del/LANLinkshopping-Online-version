@@ -83,6 +83,7 @@ class PaymentServiceTest {
         paid.setPayStatus(1);
         paid.setPayChannel("mock");
         when(orderMapper.selectById("20261004123456")).thenReturn(paid);
+        when(orderMapper.selectOne(any())).thenReturn(paid);
 
         RefundRequest req = new RefundRequest();
         req.setOrderNo("20261004123456");
