@@ -67,6 +67,22 @@ public class PaymentService {
                 new WalletPaymentCoordinator(walletService, orderService));
     }
 
+    /** Safe payment-method discovery: expose only channels that are actually configured. */
+    public List<Map<String, String>> availableChannels() {
+        List<Map<String, String>> channels = new ArrayList<>();
+        channels.add(Map.of("value", "wallet", "label", "企业钱包", "description", "使用当前钱包余额支付"));
+        if (wechat.configured()) {
+            channels.add(Map.of("value", "wechat", "label", "微信支付", "description", "扫码支付，到账后自动更新订单"));
+        }
+        if (alipay.configured()) {
+            channels.add(Map.of("value", "alipay", "label", "支付宝", "description", "跳转至支付宝安全收银台"));
+        }
+        if (props.isMock()) {
+            channels.add(Map.of("value", "mock", "label", "模拟网关", "description", "仅用于已开启模拟支付的演示环境"));
+        }
+        return channels;
+    }
+
     // ===== 发起支付 =====
 
     public PayCreateVO create(String orderNo, Long userId, String channelReq) {
