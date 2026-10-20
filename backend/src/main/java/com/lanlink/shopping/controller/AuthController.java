@@ -108,6 +108,7 @@ public class AuthController {
         User u = userService.findById(userId);
         if (u == null) throw new BusinessException("用户不存在");
         request.getSession().setAttribute(UserContext.SESSION_KEY, u);
+        setDemoReadOnlyFlag(request, u);
         loginLogService.record(userId, u.getPhone(), true, "登录成功（两步验证）", request);
         auditService.record(userId, "IDENTITY_RECOGNIZE",
                 "登录，身份: " + identityService.identify(userId, u.getRoleId()).getCode(), request);
