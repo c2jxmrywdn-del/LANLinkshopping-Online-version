@@ -144,6 +144,7 @@ class PaymentFlowTest {
     @Test
     void partialRefundSkipsFullSettle() {
         when(orderMapper.selectById("NO1")).thenReturn(order(1, "wallet", new BigDecimal("100.00"), null));
+        when(orderMapper.selectOne(any())).thenReturn(order(1, "wallet", new BigDecimal("100.00"), null));
         when(walletService.refundToWallet(any(), any(), anyString(), anyString())).thenReturn(wl(21L));
 
         RefundRequest req = new RefundRequest();
