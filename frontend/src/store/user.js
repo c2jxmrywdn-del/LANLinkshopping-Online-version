@@ -12,7 +12,7 @@ function readStoredUser() {
 
 export const useUserStore = defineStore('user', {
   // Restore the cached display identity after refresh, then verify it against the server.
-  state: () => ({ user: readStoredUser() }),
+  state: () => ({ user: readStoredUser(), sessionVerifiedAt: 0 }),
   getters: {
     logged: (s) => !!s.user,
     // ===== 身份类型（服务端 /auth/me 实时识别返回） =====
@@ -35,24 +35,31 @@ export const useUserStore = defineStore('user', {
       const data = await authApi.login(payload)
       if (data && data.require2fa) return data
       this.user = data
+      this.sessionVerifiedAt = Date.now()
       localStorage.setItem('ll_user', JSON.stringify(data))
       return data
     },
     /** 两步验证登录：校验动态码成功后建立会话 */
     async login2fa(loginTicket, code) {
       this.user = await authApi.login2fa({ loginTicket, code })
+      this.sessionVerifiedAt = Date.now()
       localStorage.setItem('ll_user', JSON.stringify(this.user))
     },
     async register(payload) {
       await authApi.register(payload)
     },
     async fetchMe() {
+      // Avoid an extra /auth/me round-trip on every protected route transition.
+      // Cached identity is only trusted briefly; initial page loads always verify it.
+      if (this.sessionVerifiedAt && Date.now() - this.sessionVerifiedAt < 30000) return this.user
       try {
         this.user = await authApi.me()
+        this.sessionVerifiedAt = Date.now()
         localStorage.setItem('ll_user', JSON.stringify(this.user))
         return this.user
       } catch (e) {
         this.user = null
+        this.sessionVerifiedAt = Date.now()
         localStorage.removeItem('ll_user')
         return null
       }
@@ -74,6 +81,7 @@ export const useUserStore = defineStore('user', {
     async logout() {
       try { await authApi.logout() } catch (e) {}
       this.user = null
+      this.sessionVerifiedAt = Date.now()
       localStorage.removeItem('ll_user')
     }
   }
