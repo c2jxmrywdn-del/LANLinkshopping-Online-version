@@ -26,7 +26,7 @@ jobs:
           node-version: 22
       - name: Install dependencies
         working-directory: frontend
-        run: npm install --no-fund
+        run: npm install --legacy-peer-deps --no-fund --no-audit
       - name: Run tests
         working-directory: frontend
         run: npm test
