@@ -73,6 +73,8 @@ public class CreditTermService {
         CreditAccount old = accountMapper.selectOne(Wrappers.<CreditAccount>lambdaQuery().eq(CreditAccount::getUserId, userId));
         if (old != null && "ACTIVE".equals(old.getStatus()))
             throw new BusinessException("当前已有生效中的授信额度");
+        if (old != null && "PENDING".equals(old.getStatus()))
+            throw new BusinessException("已有授信申请正在审核，请勿重复提交");
         CreditAccount a = old == null ? new CreditAccount() : old;
         User u = userMapper.selectById(userId);
         a.setUserId(userId);
@@ -139,18 +141,30 @@ public class CreditTermService {
 
     @Transactional
     public CreditBill repay(Long userId, Long id, BigDecimal amount, String method) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) throw new BusinessException("还款金额必须大于 0");
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException("还款金额必须大于 0");
+        if (amount.scale() > 2)
+            throw new BusinessException("还款金额最多两位小数");
+        String normalizedMethod = method == null || method.isBlank() ? "wallet" : method.trim().toLowerCase(Locale.ROOT);
+        // Bank-transfer settlement is not implemented yet. Never mark a bill as paid
+        // merely because the client selects "transfer"; that would release credit without collecting funds.
+        if (!"wallet".equals(normalizedMethod))
+            throw new BusinessException("目前仅支持企业钱包还款；对公转账需完成收款核验后才能开通");
+
         CreditBill b = billMapper.selectForUpdate(id, userId);
         if (b == null) throw new BusinessException("账单不存在");
-        if ("PAID".equals(b.getStatus()) || "CANCELLED".equals(b.getStatus())) throw new BusinessException("账单已结清或已取消");
-        if (amount.compareTo(b.getOutstandingAmount()) > 0) amount = b.getOutstandingAmount();
-        if ("wallet".equalsIgnoreCase(method == null ? "wallet" : method)) {
-            walletService.payFromWallet(userId, amount, "CREDIT-" + id);
-        }
+        if ("PAID".equals(b.getStatus()) || "CANCELLED".equals(b.getStatus()))
+            throw new BusinessException("账单已结清或已取消");
+        if (b.getOutstandingAmount() == null || b.getOutstandingAmount().compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException("账单剩余应还金额异常");
+        if (amount.compareTo(b.getOutstandingAmount()) > 0)
+            throw new BusinessException("还款金额不能超过剩余应还金额");
+        walletService.payFromWallet(userId, amount, "CREDIT-" + id);
+
         CreditRepayment r = new CreditRepayment();
         r.setBillId(id); r.setUserId(userId); r.setAmount(amount);
-        r.setMethod(method == null || method.isBlank() ? "wallet" : method);
-        r.setReferenceNo("CR" + System.currentTimeMillis());
+        r.setMethod(normalizedMethod);
+        r.setReferenceNo("CR" + UUID.randomUUID().toString().replace("-", "").substring(0, 24));
         r.setRemark("账期账单还款");
         r.setCreateTime(LocalDateTime.now());
         repaymentMapper.insert(r);
@@ -198,6 +212,8 @@ public class CreditTermService {
     public CreditAccount review(Long id, String status, BigDecimal approvedLimit, Integer termDays, String remark) {
         CreditAccount a = accountMapper.selectById(id);
         if (a == null) throw new BusinessException("授信申请不存在");
+        if (!"PENDING".equals(a.getStatus()))
+            throw new BusinessException("只有待审核的授信申请可以审核，已生效或已处理的额度不可重复审批");
         if (!"ACTIVE".equals(status) && !"REJECTED".equals(status)) throw new BusinessException("审核状态无效");
         if ("ACTIVE".equals(status)) {
             BigDecimal used = a.getUsedLimit() == null ? BigDecimal.ZERO : a.getUsedLimit();
