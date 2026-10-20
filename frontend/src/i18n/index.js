@@ -928,7 +928,8 @@ function _observeDom(){
         const current=node.nodeValue ?? ''
         const lastTranslated=_lastTranslatedNodes.get(node)
         if(lastTranslated===current){
-          _lastTranslatedNodes.delete(node)
+          // Keep the marker until Vue writes a different value; a single observer
+          // callback may contain multiple records for the same translated node.
           continue
         }
         // Vue may reuse a text node for a different route or API response. Capture the new
@@ -950,7 +951,7 @@ function _observeDom(){
         if(['placeholder','title','aria-label','alt'].includes(attr)){
           const current=el.getAttribute(attr) ?? ''
           let last=_lastTranslatedAttrs.get(el)
-          if(last && last[attr]===current){ delete last[attr]; continue }
+          if(last && last[attr]===current) continue
           let cache=_attrSources.get(el)
           if(!cache){cache={};_attrSources.set(el,cache)}
           if(/[\u4e00-\u9fff]/.test(current) || cache[attr]===undefined) cache[attr]=current
