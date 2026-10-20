@@ -239,7 +239,14 @@ public class OrderService {
     public void applyRefundResult(String orderNo, String refundId, BigDecimal refundAmount, boolean success) {
         Order o = orderMapper.selectById(orderNo);
         if (o == null) throw new BusinessException("订单不存在: " + orderNo);
-        o.setRefundStatus(success ? "success" : "processing");
+        BigDecimal cumulativeRefund = refundAmount != null ? refundAmount
+                : (o.getRefundAmount() == null ? BigDecimal.ZERO : o.getRefundAmount());
+        if (success) {
+            // "success" is reserved for a full refund; partial refunds must remain refundable.
+            o.setRefundStatus(cumulativeRefund.compareTo(o.getTotalAmount()) >= 0 ? "success" : "partial");
+        } else {
+            o.setRefundStatus("processing");
+        }
         if (refundId != null) o.setRefundId(refundId);
         if (refundAmount != null) o.setRefundAmount(refundAmount);
         if (success) o.setRefundTime(LocalDateTime.now());
