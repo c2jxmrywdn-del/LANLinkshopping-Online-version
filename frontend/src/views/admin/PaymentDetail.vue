@@ -19,12 +19,13 @@
             </a-descriptions>
           </a-card>
           <a-card :bordered="false" class="card" title="支付核验">
-            <a-result v-if="paymentStatusCode === 1" status="success" title="支付已确认" sub-title="支付状态已由服务端返回" />
+            <a-result v-if="order.payType === 'term'" status="info" title="账期交易已开单" sub-title="订单已占用企业授信；此状态不代表现金已到账，请核对账期账单与还款记录。" />
+            <a-result v-else-if="paymentStatusCode === 1" status="success" title="支付已确认" sub-title="支付状态已由服务端返回" />
             <a-result v-else-if="paymentStatusCode === 2" status="info" title="订单已退款" sub-title="此订单已完成全额退款" />
             <a-result v-else status="info" title="尚未完成支付" sub-title="当前交易没有已确认的支付结果" />
             <a-descriptions :column="1" size="small">
-              <a-descriptions-item label="渠道">{{channelText[payment?.payChannel || order.payChannel] || payment?.payChannel || order.payChannel || '—'}}</a-descriptions-item>
-              <a-descriptions-item label="交易状态">{{paymentStatusCode === 1 ? 'SUCCESS' : paymentStatusCode === 2 ? 'REFUNDED' : 'PENDING'}}</a-descriptions-item>
+              <a-descriptions-item label="渠道">{{order.payType === 'term' ? '企业账期' : (channelText[payment?.payChannel || order.payChannel] || payment?.payChannel || order.payChannel || '—')}}</a-descriptions-item>
+              <a-descriptions-item label="交易状态">{{order.payType === 'term' ? 'CREDIT_TERM' : (paymentStatusCode === 1 ? 'SUCCESS' : paymentStatusCode === 2 ? 'REFUNDED' : 'PENDING')}}</a-descriptions-item>
               <a-descriptions-item label="第三方交易号">{{payment?.transactionId || order.transactionId || '—'}}</a-descriptions-item>
             </a-descriptions>
           </a-card>
