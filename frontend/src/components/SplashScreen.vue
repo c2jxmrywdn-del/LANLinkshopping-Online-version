@@ -14,11 +14,11 @@
 
       <div class="ss-content">
         <BrandDecodeReveal class="ss-wordmark" size="clamp(38px, 5vw, 58px)" mode="soft" delay="1.55s" />
-        <div class="ss-tagline">聚合 · 连接 · 一体多元解决方案</div>
+        <div class="ss-tagline">{{ translateText('聚合 · 连接 · 一体多元解决方案') }}</div>
         <div class="ss-progress" aria-hidden="true"><span class="ss-progress-bar"></span></div>
       </div>
 
-      <button class="ss-skip" @click="finish">跳过 ›</button>
+      <button class="ss-skip" @click="finish">{{ translateText('跳过') }} ›</button>
     </div>
   </transition>
 </template>
@@ -26,6 +26,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import BrandDecodeReveal from './BrandDecodeReveal.vue'
+import { translateText } from '../i18n'
 
 const emit = defineEmits(['done'])
 const visible = ref(true)

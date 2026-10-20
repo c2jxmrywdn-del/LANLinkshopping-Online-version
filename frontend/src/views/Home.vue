@@ -5,26 +5,26 @@
       <div class="brand-hero-copy">
         <span class="brand-eyebrow">LANLINK SHOPPING · CONNECTED COMMERCE</span>
         <BrandWordmark class="home-wordmark" size="clamp(38px, 5vw, 58px)" />
-        <h1>让每一次连接，都产生价值。</h1>
-        <p>连接商品、采购、商户与增长，让交易从发现开始，在同一个网络里持续发生。</p>
-        <div class="brand-actions"><a-button type="primary" class="brand-primary" @click="$router.push('/mall')">进入商城 <span>→</span></a-button><a-button class="brand-ghost" @click="$router.push('/about')">了解平台</a-button></div>
+        <h1>{{ translateText('让每一次连接，都产生价值。') }}</h1>
+        <p>{{ translateText('连接商品、采购、商户与增长，让交易从发现开始，在同一个网络里持续发生。') }}</p>
+        <div class="brand-actions"><a-button type="primary" class="brand-primary" @click="$router.push('/mall')">{{ translateText('进入商城') }} <span>→</span></a-button><a-button class="brand-ghost" @click="$router.push('/about')">{{ translateText('了解平台') }}</a-button></div>
       </div>
       <BrandSymbol class="brand-orbit" size="410px" />
     </section>
     <div class="brand-promise"><span>01</span><b>DISCOVER</b><em>→</em><span>02</span><b>TRANSACT</b><em>→</em><span>03</span><b>GROW</b></div>
     <BannerCarousel />
 
-    <h2 class="sec"><span>01</span> 行业解决方案</h2>
+    <h2 class="sec"><span>01</span> {{ translateText('行业解决方案') }}</h2>
     <a-row :gutter="16">
       <a-col :span="6" v-for="ind in industries" :key="ind.indId">
         <a-card hoverable class="ind-card" @click="$router.push({ name: 'mall', query: { indId: ind.indId } })">
-          <div class="ind-name" :title="ind.name">{{ ind.name }}</div>
-          <div class="ind-desc" :title="'查看'+ind.name+'专区商品'">查看{{ ind.name }}专区商品 →</div>
+          <div class="ind-name" :title="translateText(ind.name)">{{ translateText(ind.name) }}</div>
+          <div class="ind-desc" :title="industryDescription(ind.name)">{{ industryDescription(ind.name) }}</div>
         </a-card>
       </a-col>
     </a-row>
 
-    <div class="section-head"><h2 class="sec"><span>02</span> 热销推荐</h2><button class="section-link" type="button" @click="$router.push('/mall')">查看全部商品 →</button></div>
+    <div class="section-head"><h2 class="sec"><span>02</span> {{ translateText('热销推荐') }}</h2><button class="section-link" type="button" @click="$router.push('/mall')">{{ translateText('查看全部商品 →') }}</button></div>
     <a-row :gutter="16">
       <a-col :span="6" v-for="p in hot" :key="p.prodId">
         <InteractiveProductCard
@@ -35,7 +35,7 @@
           @click="$router.push('/product/' + p.prodId)"
         >
           <template #footer>
-            <div class="product-card-meta">销量 {{ p.sales }} · 库存 {{ p.stock }}</div>
+            <div class="product-card-meta">{{ translateText('销量') }} {{ p.sales }} · {{ translateText('库存') }} {{ p.stock }}</div>
           </template>
         </InteractiveProductCard>
       </a-col>
@@ -46,6 +46,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { homeApi } from '../api'
+import { locale, translateText } from '../i18n'
 import BannerCarousel from '../components/BannerCarousel.vue'
 import BrandWordmark from '../components/BrandWordmark.vue'
 import BrandSymbol from '../components/BrandSymbol.vue'
@@ -56,6 +57,12 @@ onMounted(async () => {
   industries.value = await homeApi.industries()
   hot.value = await homeApi.hot(8)
 })
+function industryDescription(name) {
+  const source = String(name || '')
+  if (locale.value === 'en-US') return `View ${translateText(source)} Products →`
+  return `查看${source}专区商品 →`
+}
+
 </script>
 
 <style scoped>

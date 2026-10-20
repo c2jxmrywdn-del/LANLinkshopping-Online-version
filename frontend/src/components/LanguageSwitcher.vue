@@ -1,5 +1,5 @@
 <template>
-  <button class="locale-switcher" type="button" :aria-label="isEn ? '切换为中文' : 'Switch to English'" @click="toggle">
+  <button class="locale-switcher" type="button" :aria-label="isEn ? 'Switch to Chinese' : '切换为英文'" @click="toggle">
     <span :class="{ active: !isEn }">中</span>
     <i aria-hidden="true"></i>
     <span :class="{ active: isEn }">EN</span>

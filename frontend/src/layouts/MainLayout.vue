@@ -15,16 +15,16 @@
             :ellipsis="false"
             @click="onNav"
           >
-            <a-menu-item key="home">首页</a-menu-item>
-            <a-menu-item key="mall" @mouseenter="openMallMenu">商城</a-menu-item>
-            <a-menu-item key="promotions">优惠</a-menu-item>
-            <a-menu-item v-if="user.hasPerm('credit:view')" key="credit-term">账期</a-menu-item>
-            <a-menu-item v-if="user.hasPerm('order:view')" key="orders">我的订单</a-menu-item>
-            <a-menu-item v-if="user.isAdmin" key="admin/merchants">商户管理</a-menu-item>
-            <a-menu-item v-else-if="user.logged && !user.isMerchant" key="merchant">商户入驻</a-menu-item>
-            <a-menu-item v-if="user.hasPerm('merchant:manage')" key="merchant/traffic">流量管理</a-menu-item>
-            <a-menu-item v-if="user.hasPerm('product:publish')" key="merchant/products">我的商品</a-menu-item>
-            <a-menu-item key="about">关于我们</a-menu-item>
+            <a-menu-item key="home">{{ translateText('首页') }}</a-menu-item>
+            <a-menu-item key="mall" @mouseenter="openMallMenu">{{ translateText('商城') }}</a-menu-item>
+            <a-menu-item key="promotions">{{ translateText('优惠') }}</a-menu-item>
+            <a-menu-item v-if="user.hasPerm('credit:view')" key="credit-term">{{ translateText('账期') }}</a-menu-item>
+            <a-menu-item v-if="user.hasPerm('order:view')" key="orders">{{ translateText('我的订单') }}</a-menu-item>
+            <a-menu-item v-if="user.isAdmin" key="admin/merchants">{{ translateText('商户管理') }}</a-menu-item>
+            <a-menu-item v-else-if="user.logged && !user.isMerchant" key="merchant">{{ translateText('商户入驻') }}</a-menu-item>
+            <a-menu-item v-if="user.hasPerm('merchant:manage')" key="merchant/traffic">{{ translateText('流量管理') }}</a-menu-item>
+            <a-menu-item v-if="user.hasPerm('product:publish')" key="merchant/products">{{ translateText('我的商品') }}</a-menu-item>
+            <a-menu-item key="about">{{ translateText('关于我们') }}</a-menu-item>
           </a-menu>
 
           <IndustryCategoryMenu
@@ -43,10 +43,10 @@
         </div>
         <div class="right">
           <a-badge v-if="user.logged" :count="user.unread" :overflow-count="99">
-            <a-button type="text" class="ll-tap" style="color:#fff" @pointerdown="onTap" @click.stop="goMessages">🔔 消息</a-button>
+            <a-button type="text" class="ll-tap" style="color:#fff" @pointerdown="onTap" @click.stop="goMessages">🔔 {{ translateText('消息') }}</a-button>
           </a-badge>
           <a-badge :count="cart.count" :overflow-count="99">
-            <a-button type="text" class="ll-tap" style="color:#fff" @pointerdown="onTap" @click.stop="goCart">🛒 购物车</a-button>
+            <a-button type="text" class="ll-tap" style="color:#fff" @pointerdown="onTap" @click.stop="goCart">🛒 {{ translateText('购物车') }}</a-button>
           </a-badge>
           <template v-if="user.logged">
             <a-dropdown>
@@ -60,29 +60,29 @@
                   :ring="false"
                   class="header-avatar"
                 />
-                <span v-if="user.isVip" class="id-badge id-vip" title="VIP 用户">VIP</span>
-                <span v-else-if="user.isAdmin" class="id-badge id-admin" title="平台管理员">ADMIN</span>
-                <span v-else-if="user.isMerchant" class="id-badge id-merchant" title="入驻商户">商户</span>
+                <span v-if="user.isVip" class="id-badge id-vip" :title="translateText('VIP 用户')">VIP</span>
+                <span v-else-if="user.isAdmin" class="id-badge id-admin" :title="translateText('平台管理员')">ADMIN</span>
+                <span v-else-if="user.isMerchant" class="id-badge id-merchant" :title="translateText('商户')">{{ translateText('商户') }}</span>
                 <span class="header-user-name">{{ user.user.nickname }} ▾</span>
               </a>
               <template #overlay>
                 <a-menu>
                   <a-menu-item disabled>
-                    <div class="id-scope">当前身份：<b>{{ user.identityName }}</b><br/>{{ user.identityScope }}</div>
+                    <div class="id-scope">{{ translateText('当前身份') }}：<b>{{ translateText(user.identityName) }}</b><br/>{{ translateText(user.identityScope) }}</div>
                   </a-menu-item>
                   <a-menu-divider />
-                  <a-menu-item @click="$router.push('/wallet')">💰 我的钱包</a-menu-item><a-menu-item v-if="user.hasPerm('credit:view')" @click="$router.push('/credit-term')">企业账期</a-menu-item>
-                  <a-menu-item @click="$router.push('/activity')">🎯 活动中心</a-menu-item>
-                  <a-menu-item @click="$router.push('/membership')"><MembershipIcon :size="18" class="membership-menu-icon" /> 会员中心</a-menu-item>
-                  <a-menu-item @click="$router.push('/me')">个人资料</a-menu-item><a-menu-item @click="$router.push('/me/messages')">消息中心</a-menu-item><a-menu-item @click="$router.push('/me/address')">收货地址</a-menu-item><a-menu-item @click="$router.push('/me/login-log')">登录安全</a-menu-item><a-menu-item @click="$router.push('/me/settings')">账户设置</a-menu-item>
-                  <a-menu-item @click="doLogout">退出登录</a-menu-item>
+                  <a-menu-item @click="$router.push('/wallet')">💰 {{ translateText('我的钱包') }}</a-menu-item><a-menu-item v-if="user.hasPerm('credit:view')" @click="$router.push('/credit-term')">{{ translateText('企业账期') }}</a-menu-item>
+                  <a-menu-item @click="$router.push('/activity')">🎯 {{ translateText('活动中心') }}</a-menu-item>
+                  <a-menu-item @click="$router.push('/membership')"><MembershipIcon :size="18" class="membership-menu-icon" /> {{ translateText('会员中心') }}</a-menu-item>
+                  <a-menu-item @click="$router.push('/me')">{{ translateText('个人资料') }}</a-menu-item><a-menu-item @click="$router.push('/me/messages')">{{ translateText('消息中心') }}</a-menu-item><a-menu-item @click="$router.push('/me/address')">{{ translateText('收货地址') }}</a-menu-item><a-menu-item @click="$router.push('/me/login-log')">{{ translateText('登录安全') }}</a-menu-item><a-menu-item @click="$router.push('/me/settings')">{{ translateText('账户设置') }}</a-menu-item>
+                  <a-menu-item @click="doLogout">{{ translateText('退出登录') }}</a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
           </template>
           <template v-else>
             <!-- 深色顶栏上使用白字白边（WCAG 对比度达标） -->
-            <a-button type="primary" ghost style="color:#fff;border-color:#fff" @click="$router.push('/login')">登录 / 注册</a-button>
+            <a-button type="primary" ghost style="color:#fff;border-color:#fff" @click="$router.push('/login')">{{ translateText('登录 / 注册') }}</a-button>
           </template>
         </div>
       </div>
@@ -94,15 +94,15 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="footer-wordmark ll-wordmark"><span class="ll-lan">LAN</span><span class="ll-link">Link</span><span class="ll-shopping">shopping</span></div>
-          <p>让每一次连接，都产生价值。</p>
+          <p>{{ translateText('让每一次连接，都产生价值。') }}</p>
           <small>CONNECTED COMMERCE · B2B DEMO PLATFORM</small>
         </div>
         <div class="footer-links">
-          <button type="button" @click.stop="$router.push('/mall')">商城</button>
-          <button type="button" @click.stop="$router.push('/about')">关于我们</button>
-          <button type="button" @click.stop="$router.push({ path: '/about', hash: '#contact' })">联系我们</button>
-          <button type="button" @click.stop="$router.push({ name: 'privacy-cookies' })">隐私与 Cookie</button>
-          <button type="button" @click.stop="$router.push({ name: 'about', query: { legal: 'ip' }, hash: '#terms' })">知识产权声明</button>
+          <button type="button" @click.stop="$router.push('/mall')">{{ translateText('商城') }}</button>
+          <button type="button" @click.stop="$router.push('/about')">{{ translateText('关于我们') }}</button>
+          <button type="button" @click.stop="$router.push({ path: '/about', hash: '#contact' })">{{ translateText('联系我们') }}</button>
+          <button type="button" @click.stop="$router.push({ name: 'privacy-cookies' })">{{ translateText('隐私与 Cookie') }}</button>
+          <button type="button" @click.stop="$router.push({ name: 'about', query: { legal: 'ip' }, hash: '#terms' })">{{ translateText('知识产权声明') }}</button>
         </div>
         <AuthorCard variant="compact" />
       </div>
@@ -123,6 +123,7 @@ import AuthorCard from '../components/AuthorCard.vue'
 import UserAvatar from '../components/ui/UserAvatar.vue'
 import MembershipIcon from '../components/ui/MembershipIcon.vue'
 import SupportChat from '../components/SupportChat.vue'
+import { translateText } from '../i18n'
 
 const router = useRouter()
 const route = useRoute()

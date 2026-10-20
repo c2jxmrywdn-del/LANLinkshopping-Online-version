@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { t, setLocale } from './index'
+import { t, setLocale, translateText } from './index'
 
 describe('轻量 i18n', () => {
   beforeEach(() => {
@@ -56,12 +56,33 @@ describe('轻量 i18n', () => {
     const liveText = document.querySelector('[data-live]').firstChild
     liveText.nodeValue = '运行沙盒测试'
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(document.querySelector('[data-live]').textContent).toBe('Run Sandbox Test')
+    expect(document.querySelector('[data-live]').textContent).toBe('运行沙盒测试')
 
     setLocale('zh-CN')
     expect(document.body.textContent).toContain('查看全部商品 →')
     expect(document.body.textContent).toContain('配送与履约')
     expect(document.querySelector('[data-live]').textContent).toBe('运行沙盒测试')
+  })
+
+  it('新增文本节点可翻译并在切回中文时恢复', async () => {
+    document.body.innerHTML = '<main><div id="dynamic-mount"></div></main>'
+    setLocale('en-US')
+    const node = document.createTextNode('跳过 ›')
+    document.querySelector('#dynamic-mount').appendChild(node)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(document.querySelector('#dynamic-mount').textContent).toBe('Skip ›')
+    setLocale('zh-CN')
+    expect(document.querySelector('#dynamic-mount').textContent).toBe('跳过 ›')
+  })
+
+  it('组件级文案随语言切换同步更新', () => {
+    expect(translateText('销量')).toBe('销量')
+    setLocale('en-US')
+    expect(translateText('销量')).toBe('Sales')
+    expect(translateText('库存')).toBe('Inventory')
+    expect(translateText('建筑行业')).toBe('Construction & Building Materials')
+    setLocale('zh-CN')
+    expect(translateText('库存')).toBe('库存')
   })
 
   it('首页轮播、行业入口、客服和作者元数据在英文下完整翻译', () => {

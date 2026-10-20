@@ -3,15 +3,15 @@
     <section class="industry-pane">
       <div class="pane-head">
         <div>
-          <strong>行业</strong>
+          <strong>{{ translateText('行业') }}</strong>
           <small>INDUSTRIES · {{ industries.length }}</small>
         </div>
-        <span v-if="loading" class="syncing">同步中…</span>
-        <span v-else class="syncing">自动同步</span>
+        <span v-if="loading" class="syncing">{{ translateText('同步中…') }}</span>
+        <span v-else class="syncing">{{ translateText('自动同步') }}</span>
       </div>
 
       <button type="button" class="all-entry" :class="{ active: !activeIndustry }" @click.stop="selectAll">
-        <span>全部商品</span>
+        <span>{{ translateText('全部商品') }}</span>
         <i>→</i>
       </button>
 
@@ -26,32 +26,32 @@
           @focus="setActive(industry)"
           @click.stop="selectIndustry(industry)"
         >
-          <span>{{ industry.name }}</span>
+          <span>{{ translateText(industry.name) }}</span>
           <i>›</i>
         </button>
       </div>
 
       <div v-if="error" class="load-error">
-        <span>行业数据暂时无法更新</span>
-        <button type="button" @click.stop="refresh(true)">重试</button>
+        <span>{{ translateText('行业数据暂时无法更新') }}</span>
+        <button type="button" @click.stop="refresh(true)">{{ translateText('重试') }}</button>
       </div>
     </section>
 
     <section class="category-pane">
       <div class="pane-head">
         <div>
-          <strong>{{ activeIndustry?.name || '全部行业' }}</strong>
+          <strong>{{ translateText(activeIndustry?.name || '全部行业') }}</strong>
           <small>PRODUCT CATEGORIES</small>
         </div>
-        <span v-if="activeIndustry">{{ activeIndustryCount }} 类</span>
+        <span v-if="activeIndustry">{{ activeIndustryCount }} {{ translateText('类') }}</span>
       </div>
 
       <div v-if="activeIndustry && categoryTree.length" class="category-grid">
         <article v-for="root in categoryTree" :key="root.catId" class="category-group">
           <button type="button" class="root-cat" @click.stop="selectCategory(root)">
             <span class="category-dot"></span>
-            <b>{{ root.name }}</b>
-            <em>进入</em>
+            <b>{{ translateText(root.name) }}</b>
+            <em>{{ translateText('进入') }}</em>
           </button>
 
           <div v-if="root.children?.length" class="child-list">
@@ -85,37 +85,37 @@
       </div>
 
       <div v-else-if="activeIndustry" class="empty-state">
-        <strong>该行业暂无细分分类</strong>
-        <span>行业已自动接入，等待商品分类配置。</span>
+        <strong>{{ translateText('该行业暂无细分分类') }}</strong>
+        <span>{{ translateText('行业已自动接入，等待商品分类配置。') }}</span>
       </div>
 
       <div v-else class="empty-state">
-        <strong>综合商品中心</strong>
-        <span>覆盖平台当前全部行业采购供给。</span>
+        <strong>{{ translateText('综合商品中心') }}</strong>
+        <span>{{ translateText('覆盖平台当前全部行业采购供给。') }}</span>
       </div>
     </section>
 
     <section class="quick-pane">
       <div class="pane-head">
         <div>
-          <strong>采购入口</strong>
+          <strong>{{ translateText('采购入口') }}</strong>
           <small>QUICK ACCESS</small>
         </div>
       </div>
 
       <button type="button" class="shortcut-card" @click.stop="quick('all')">
-        <b>全部商品</b>
-        <span>查看全平台供给</span>
+        <b>{{ translateText('全部商品') }}</b>
+        <span>{{ translateText('查看全平台供给') }}</span>
         <i>→</i>
       </button>
       <button type="button" class="shortcut-card" @click.stop="quick('sales')">
-        <b>热销采购</b>
-        <span>按销量快速筛选</span>
+        <b>{{ translateText('热销采购') }}</b>
+        <span>{{ translateText('按销量快速筛选') }}</span>
         <i>→</i>
       </button>
       <button type="button" class="shortcut-card" @click.stop="quick('promotions')">
-        <b>采购优惠</b>
-        <span>满减与行业折扣</span>
+        <b>{{ translateText('采购优惠') }}</b>
+        <span>{{ translateText('满减与行业折扣') }}</span>
         <i>→</i>
       </button>
     </section>
@@ -125,6 +125,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { homeApi } from '../api'
+import { translateText } from '../i18n'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },

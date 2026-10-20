@@ -14,12 +14,12 @@
     >
       <SwiperSlide v-for="s in slides" :key="s.key">
         <div class="slide" :class="`slide-${s.key}`" @click="go(s)">
-          <img :src="s.img" :alt="s.title" loading="lazy" decoding="async" />
+          <img :src="s.img" :alt="translateText(s.title)" loading="lazy" decoding="async" />
           <div class="mask"></div>
           <div class="content">
-            <h2>{{ s.title }}</h2>
-            <p>{{ s.sub }}</p>
-            <span class="cta">{{ s.cta }} →</span>
+            <h2>{{ translateText(s.title) }}</h2>
+            <p>{{ translateText(s.sub) }}</p>
+            <span class="cta">{{ translateText(s.cta) }} →</span>
           </div>
         </div>
       </SwiperSlide>
@@ -34,6 +34,7 @@ import { Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
+import { translateText } from '../i18n'
 
 const router = useRouter()
 const modules = [Autoplay, Pagination, Navigation, Keyboard]

@@ -894,6 +894,15 @@ function _translateString(value, toEn) {
   return out
 }
 
+/**
+ * Reactive component-level translation helper. Calling this from a Vue template tracks
+ * locale.value, so component text rerenders immediately when the user switches languages.
+ */
+export function translateText(value) {
+  if (typeof value !== 'string' || !value) return value
+  return locale.value === 'en-US' ? _translateString(value, true) : value
+}
+
 function _walkAndTranslate(root=document.body) {
   if (!root || locale.value !== 'en-US') return
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
@@ -991,7 +1000,18 @@ function _observeDom(){
           node.nodeValue=next
         }
       } else if(m.type==='childList'){
-        m.addedNodes.forEach(n=>{ if(n.nodeType===Node.ELEMENT_NODE) _walkAndTranslate(n); else if(n.nodeType===Node.TEXT_NODE && n.nodeValue?.trim()){_nodeSources.set(n,n.nodeValue);n.nodeValue=_translateString(n.nodeValue,true)} })
+        m.addedNodes.forEach(n=>{
+          if(n.nodeType===Node.ELEMENT_NODE) {
+            _walkAndTranslate(n)
+          } else if(n.nodeType===Node.TEXT_NODE && n.nodeValue?.trim()) {
+            _nodeSources.set(n,n.nodeValue)
+            const next=_translateString(n.nodeValue,true)
+            if(next!==n.nodeValue){
+              _lastTranslatedNodes.set(n,next)
+              n.nodeValue=next
+            }
+          }
+        })
       } else if(m.type==='attributes'){
         const el=m.target
         const attr=m.attributeName
