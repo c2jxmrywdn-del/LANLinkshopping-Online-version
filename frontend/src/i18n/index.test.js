@@ -56,7 +56,7 @@ describe('轻量 i18n', () => {
     const liveText = document.querySelector('[data-live]').firstChild
     liveText.nodeValue = '运行沙盒测试'
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(document.querySelector('[data-live]').textContent).toBe('运行沙盒测试')
+    expect(document.querySelector('[data-live]').textContent).toBe('Run Sandbox Test')
 
     setLocale('zh-CN')
     expect(document.body.textContent).toContain('查看全部商品 →')
