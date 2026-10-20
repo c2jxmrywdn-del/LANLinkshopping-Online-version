@@ -27,7 +27,7 @@
         <a-form-item label="收货地址" :rules="[{ required: true }]"><a-textarea v-model:value="form.address" :rows="2" /></a-form-item>
         <a-form-item label="支付方式">
           <a-radio-group v-model:value="form.payType">
-            <a-radio value="corporate">对公转账</a-radio>
+            <a-radio value="corporate">在线支付（结算时选择可用渠道）</a-radio>
             <a-radio value="balance">企业钱包<span v-if="walletLoaded" class="wallet-tip">（余额 ¥{{ walletBalance.toFixed(2) }}<template v-if="walletInsufficient">，不足</template>）</span></a-radio>
             <a-radio value="term" :disabled="termUnavailable">账期/尾款
               <span v-if="creditLoaded" class="wallet-tip">（可用授信 ¥{{ creditAvailable.toFixed(2) }}<template v-if="creditStatus !== 'ACTIVE'">，未开通</template><template v-else-if="termUnavailable">，额度不足</template>）</span>
@@ -36,8 +36,9 @@
           <div v-if="form.payType === 'term' && creditStatus !== 'ACTIVE'" class="wallet-warn">
             当前没有生效的企业账期，可前往 <a @click="$router.push('/credit-term')">账期管理</a> 申请授信。
           </div>
-          <div v-else-if="form.payType === 'term' && termUnavailable" class="wallet-warn">
-            当前账期可用额度不足，本单需 ¥{{ payableTotal }}，可前往 <a @click="$router.push('/credit-term')">账期管理</a> 查看额度。
+          <div v-else-if="form.payType === 'term' && termEstimateInsufficient" class="wallet-warn">
+            按当前页面金额估算，授信可能不足。实际金额会由服务端按促销、会员折扣和积分抵扣后再次核验。
+            可前往 <a @click="$router.push('/credit-term')">账期管理</a> 查看额度。
           </div>
           <div v-if="form.payType === 'balance' && walletInsufficient" class="wallet-warn">
             钱包余额不足，可在支付前前往 <a @click="$router.push('/wallet')">我的钱包</a> 充值。
@@ -77,21 +78,34 @@
       </div>
       <div class="row total"><span>应付合计</span><b>¥{{ payableTotal }}</b></div>
     </a-card>
+    <PaymentMethodModal
+      :open="payOpen"
+      :order-no="paymentOrderNo"
+      :amount="paymentAmount"
+      :default-channel="preferredChannel"
+      @close="closePayment"
+      @paid="onPaymentPaid"
+    />
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { message, Modal } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 import { orderApi, paymentApi, userApi, membershipApi, walletApi, creditTermApi } from '../api'
 import { useCartStore } from '../store/cart'
 import { useUserStore } from '../store/user'
+import PaymentMethodModal from '../components/payment/PaymentMethodModal.vue'
 
 const router = useRouter()
 const cart = useCartStore()
 const user = useUserStore()
 const loading = ref(false)
+const payOpen = ref(false)
+const paymentOrderNo = ref('')
+const paymentAmount = ref(0)
+const preferredChannel = ref('')
 const form = reactive({ receiver: '', phone: '', address: '', remark: '', payType: 'corporate' })
 
 // ===== 个人中心地址联动：默认地址自动带入，点击卡片一键填充 =====
@@ -154,7 +168,8 @@ const walletInsufficient = computed(() => walletBalance.value < (cart.total - re
 const creditLoaded = ref(false)
 const creditStatus = ref('NOT_APPLIED')
 const creditAvailable = ref(0)
-const termUnavailable = computed(() => creditStatus.value !== 'ACTIVE' || creditAvailable.value < (cart.total - redeemAmount.value))
+const termUnavailable = computed(() => creditStatus.value !== 'ACTIVE')
+const termEstimateInsufficient = computed(() => creditAvailable.value < Math.max(0, cart.total - redeemAmount.value))
 
 onMounted(async () => {
   try {
@@ -200,6 +215,15 @@ function pickAddr(a) {
   message.success(`已选用 ${a.receiver} 的地址`, 2)
 }
 
+function closePayment() {
+  payOpen.value = false
+  if (paymentOrderNo.value) router.push('/orders')
+}
+function onPaymentPaid() {
+  payOpen.value = false
+  router.push('/orders')
+}
+
 async function submit() {
   if (!cart.checkedItems.length) { message.warning('没有勾选的商品'); return }
   if (!form.receiver.trim() || !form.phone.trim() || !form.address.trim()) {
@@ -223,13 +247,13 @@ async function submit() {
         onOk: () => router.push('/credit-term/bills')
       })
     } else {
-      Modal.confirm({
-        title: '下单成功',
-        content: `订单号 ${order.orderNo}，应付 ¥${order.totalAmount}。是否立即支付？`,
-        okText: '立即支付', cancelText: '稍后支付',
-        onOk: async () => { try { if (form.payType === 'balance') { const vo = await paymentApi.create(order.orderNo, 'wallet'); if (!vo?.payInfo?.paid) throw new Error('钱包支付未确认') } else { const vo = await paymentApi.create(order.orderNo, 'mock'); if (vo?.mock) await paymentApi.mockConfirm(order.orderNo) } message.success('支付成功'); router.push('/orders') } catch (e) {} },
-        onCancel: () => router.push('/orders')
-      })
+      // Pay only through a channel that the server currently reports as configured.
+      // If the user closes the dialog or no usable channel exists, the pending order
+      // remains accessible from the order center rather than being marked as paid.
+      paymentOrderNo.value = order.orderNo
+      paymentAmount.value = Number(order.totalAmount || 0)
+      preferredChannel.value = form.payType === 'balance' ? 'wallet' : ''
+      payOpen.value = true
     }
   } finally { loading.value = false }
 }
