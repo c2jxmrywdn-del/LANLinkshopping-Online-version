@@ -105,7 +105,9 @@ export const orderApi = {
 
 // ===== 支付系统（多渠道：wallet 钱包 / mock 模拟 / wechat / alipay） =====
 export const paymentApi = {
-  // 发起支付：{ orderNo, channel } → wallet 同步完成；mock 返回模拟令牌；wechat 返回 codeUrl；alipay 返回 form
+  // Returns only real channels enabled by the current server configuration.
+  channels: () => request.get('/payment/channels'),
+  // 发起支付：wallet 同步完成；mock 仅在服务端开启时可用；wechat 返回 codeUrl；alipay 返回签名表单
   create: (orderNo, channel) => request.post('/payment/create', { orderNo, channel }),
   // mock 模式下"模拟支付成功"
   mockConfirm: (orderNo) => request.post('/payment/mock-confirm', null, { params: { orderNo } }),
