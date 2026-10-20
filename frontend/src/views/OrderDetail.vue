@@ -17,7 +17,7 @@
           </div>
           <a-steps :current="stepIndex" size="small" responsive class="steps">
             <a-step title="提交订单" :description="fmt(detail.order.createTime)" />
-            <a-step title="支付完成" :description="fmt(detail.order.payTime)" />
+            <a-step :title="detail.order.payType === 'term' ? '账期开单' : '支付完成'" :description="fmt(detail.order.payTime)" />
             <a-step title="履约中" description="等待商户发货" />
             <a-step title="完成" description="订单完成" />
           </a-steps>
@@ -49,7 +49,7 @@
             <a-descriptions :column="1" size="small">
               <a-descriptions-item label="支付方式">{{payType[detail.order.payType] || detail.order.payType || '—'}}</a-descriptions-item>
               <a-descriptions-item label="支付渠道">{{channelText[detail.order.payChannel] || detail.order.payChannel || '—'}}</a-descriptions-item>
-              <a-descriptions-item label="支付时间">{{fmt(detail.order.payTime)}}</a-descriptions-item>
+              <a-descriptions-item :label="detail.order.payType === 'term' ? '账期开单时间' : '支付时间'">{{fmt(detail.order.payTime)}}</a-descriptions-item>
               <a-descriptions-item label="退款状态">{{refundText(detail.order)}}</a-descriptions-item>
               <a-descriptions-item v-if="detail.order.refundAmount" label="已退金额">¥{{money(detail.order.refundAmount)}}</a-descriptions-item>
             </a-descriptions>
@@ -96,8 +96,8 @@ const fmt=v=>v?String(v).replace('T',' '):'—'
 const money=v=>Number(v||0).toFixed(2)
 const maskPhone=v=>{const s=String(v||'');return s.length>=7?s.slice(0,3)+'****'+s.slice(-4):s||'—'}
 const refundText=o=>o.refundStatus==='success'?'已全额退款':o.refundStatus==='partial'?'部分退款':o.refundStatus==='processing'?'退款处理中':'无退款'
-const statusText=o=>o.orderStatus===3?'订单已取消':o.orderStatus===4?'订单已退款':o.payStatus===1?'订单已支付':'待支付'
-const statusHint=o=>o.orderStatus===3?'订单已取消，无法继续操作':o.orderStatus===4?'该订单已完成退款':o.payStatus===1?'订单已进入履约流程':'完成支付后商户才会开始履约'
+const statusText=o=>o.orderStatus===3?'订单已取消':o.orderStatus===4?'订单已退款':o.payType==='term'&&o.payStatus===1?'账期订单已开单':o.payStatus===1?'订单已支付':'待支付'
+const statusHint=o=>o.orderStatus===3?'订单已取消，无法继续操作':o.orderStatus===4?'该订单已完成退款':o.payType==='term'&&o.payStatus===1?'订单已占用企业授信；请在账期管理查看账单并按期还款。':o.payStatus===1?'订单已进入履约流程':'完成支付后商户才会开始履约'
 async function load(){loading.value=true;try{detail.value=await orderApi.detail(route.params.orderNo)}catch(e){detail.value=null}finally{loading.value=false}}
 async function openPay(){try{const w=await walletApi.my();walletBalance.value=Number(w?.balance||0);payOpen.value=true}catch(e){payOpen.value=true}} async function payWith(channel){if(payLoading.value)return;if(channel==='wallet'&&walletBalance.value<Number(detail.value?.order?.totalAmount||0)){router.push('/wallet/recharge');payOpen.value=false;return}payLoading.value=true;try{const vo=await paymentApi.create(route.params.orderNo,channel);if(channel==='mock'&&vo?.mock)await paymentApi.mockConfirm(route.params.orderNo);if(channel==='wallet'&&!vo?.payInfo?.paid)throw new Error('支付未确认');message.success('支付成功');payOpen.value=false;await load()}catch(e){}finally{payLoading.value=false}}
 async function cancel(){try{await orderApi.cancel(route.params.orderNo);message.success('订单已取消');await load()}catch(e){}}
