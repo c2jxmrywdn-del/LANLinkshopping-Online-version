@@ -22,20 +22,38 @@
       </a-card>
     </div>
   </div>
+  <div v-else-if="pageLoading" class="load-state"><a-spin tip="正在加载账单…" /></div>
+  <a-result v-else status="404" title="账单不存在或无法访问" sub-title="请返回账单中心重新选择">
+    <template #extra><a-button type="primary" @click="$router.push('/credit-term/bills')">返回账单中心</a-button></template>
+  </a-result>
 </template>
 <script setup>
-import {ref,computed,onMounted} from 'vue'
+import {ref,computed,watch} from 'vue'
 import {message} from 'ant-design-vue'
 import {useRoute} from 'vue-router'
 import {creditTermApi} from '../api'
-const route=useRoute(),bill=ref(null),repayments=ref([]),amount=ref(0),method=ref('wallet'),loading=ref(false)
+const route=useRoute(),bill=ref(null),repayments=ref([]),amount=ref(0),method=ref('wallet'),loading=ref(false),pageLoading=ref(true)
 const money=v=>Number(v||0).toFixed(2)
 const billLabel=computed(()=>bill.value?.status==='PAID'?'已结清':bill.value?.status==='CANCELLED'?'已取消':bill.value?.status==='OVERDUE'||(bill.value?.dueDate&&bill.value.dueDate<new Date().toISOString().slice(0,10))?'已逾期':'待还')
 const billColor=computed(()=>billLabel.value==='已结清'?'green':billLabel.value==='已逾期'?'red':'orange')
-async function load(){const d=await creditTermApi.detail(route.params.id);bill.value=d;amount.value=Number(d?.outstandingAmount||0);repayments.value=await creditTermApi.repayments(route.params.id)||[]}
+async function load(){
+  pageLoading.value=true
+  bill.value=null
+  repayments.value=[]
+  amount.value=0
+  try{
+    const d=await creditTermApi.detail(route.params.id)
+    if(!d)return
+    bill.value=d
+    amount.value=Number(d.outstandingAmount||0)
+    repayments.value=await creditTermApi.repayments(route.params.id)||[]
+  }catch(e){
+    bill.value=null
+  }finally{pageLoading.value=false}
+}
 async function repay(){loading.value=true;try{await creditTermApi.repay(route.params.id,amount.value,method.value);message.success('还款成功');await load()}finally{loading.value=false}}
-onMounted(load)
+watch(()=>route.params.id,load,{immediate:true})
 </script>
 <style scoped>
-.detail{max-width:1000px;margin:0 auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ll-primary)}h1{margin:5px 0}.top p{margin:0;color:var(--ll-muted)}.summary{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:14px;border-radius:20px;background:var(--ll-brand-hero-gradient);color:#fff;margin-bottom:16px}.summary span{display:block;opacity:.65;font-size:12px}.summary strong{display:block;font-size:40px;margin-top:4px}.summary b{display:block;margin-top:8px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.hint{font-size:12px;color:var(--ll-muted);margin:10px 0 0}.repay-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eef0f3;gap:10px}.repay-row small{display:block;color:var(--ll-muted);margin-top:4px}.repay-row span{font-size:11px;color:#98a2b3}@media(max-width:700px){.summary,.cols{grid-template-columns:1fr}.summary strong{font-size:32px}}
+.detail{max-width:1000px;margin:0 auto}.load-state{padding:80px 0;text-align:center}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ll-primary)}h1{margin:5px 0}.top p{margin:0;color:var(--ll-muted)}.summary{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:14px;border-radius:20px;background:var(--ll-brand-hero-gradient);color:#fff;margin-bottom:16px}.summary span{display:block;opacity:.65;font-size:12px}.summary strong{display:block;font-size:40px;margin-top:4px}.summary b{display:block;margin-top:8px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.hint{font-size:12px;color:var(--ll-muted);margin:10px 0 0}.repay-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eef0f3;gap:10px}.repay-row small{display:block;color:var(--ll-muted);margin-top:4px}.repay-row span{font-size:11px;color:#98a2b3}@media(max-width:700px){.summary,.cols{grid-template-columns:1fr}.summary strong{font-size:32px}}
 </style>
