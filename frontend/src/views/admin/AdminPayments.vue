@@ -26,14 +26,17 @@
         </template>
         <template v-else-if="column.key === 'refund'">
           <a-tag v-if="record.refundStatus === 'success'" color="green">已全额退款 ¥{{ record.refundAmount }}</a-tag>
+          <a-tag v-else-if="record.refundStatus === 'partial'" color="blue">部分退款 ¥{{ record.refundAmount }}</a-tag>
           <a-tag v-else-if="record.refundStatus === 'processing'" color="orange">退款处理中</a-tag>
+          <a-tag v-else-if="record.payType === 'term'" color="orange">账期订单 · 暂不支持原路退款</a-tag>
           <span v-else style="color:#999">—</span>
         </template>
         <template v-else-if="column.key === 'time'">{{ (record.payTime || record.createTime || '').replace('T', ' ') }}</template>
         <template v-else-if="column.key === 'op'">
           <a-button size="small" @click="$router.push('/admin/payments/' + record.orderNo)">详情</a-button>
-          <a-button v-if="record.payStatus === 1 && record.refundStatus !== 'success'"
+          <a-button v-if="record.payType !== 'term' && record.payStatus === 1 && record.refundStatus !== 'success'"
                     size="small" danger @click="openRefund(record)">退款</a-button>
+          <a-tag v-else-if="record.payType === 'term' && record.refundStatus !== 'success'" color="orange">需账期冲销流程</a-tag>
           <span v-else style="color:#999">—</span>
         </template>
       </template>
