@@ -4,7 +4,7 @@
       <a-radio-group v-model:value="payStatus" button-style="solid" @change="load(1)">
         <a-radio-button :value="null">全部</a-radio-button>
         <a-radio-button :value="0">未支付</a-radio-button>
-        <a-radio-button :value="1">已支付</a-radio-button>
+        <a-radio-button :value="1">已支付 / 账期已开单</a-radio-button>
         <a-radio-button :value="2">已退款</a-radio-button>
       </a-radio-group>
     </template>
@@ -13,7 +13,7 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'total'">¥{{ record.totalAmount }}</template>
         <template v-else-if="column.key === 'pay'">
-          <a-tag :color="payColor[record.payStatus]">{{ payText[record.payStatus] || record.payStatus }}</a-tag>
+          <a-tag :color="record.payType === 'term' && record.payStatus === 1 ? 'blue' : payColor[record.payStatus]">{{ record.payType === 'term' && record.payStatus === 1 ? '账期已开单' : (payText[record.payStatus] || record.payStatus) }}</a-tag>
         </template>
         <template v-else-if="column.key === 'status'">
           <a-tag>{{ orderText[record.orderStatus] || record.orderStatus }}</a-tag>
