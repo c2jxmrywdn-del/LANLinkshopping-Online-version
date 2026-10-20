@@ -1,5 +1,6 @@
 package com.lanlink.shopping.payment.service;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lanlink.shopping.common.BusinessException;
 import com.lanlink.shopping.entity.Order;
 import com.lanlink.shopping.mapper.OrderMapper;
@@ -12,6 +13,7 @@ import com.lanlink.shopping.payment.wallet.entity.WalletLog;
 import com.lanlink.shopping.payment.wallet.service.WalletService;
 import com.lanlink.shopping.payment.wechat.WechatPayClient;
 import com.lanlink.shopping.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +43,12 @@ public class PaymentService {
     private final OrderMapper orderMapper;
     private final PaymentLogService payLog;
     private final WalletService walletService;
+    private final WalletPaymentCoordinator walletPaymentCoordinator;
 
+    @Autowired
     public PaymentService(PaymentProperties props, WechatPayClient wechat, AlipayPayClient alipay,
                           OrderService orderService, OrderMapper orderMapper, PaymentLogService payLog,
-                          WalletService walletService) {
+                          WalletService walletService, WalletPaymentCoordinator walletPaymentCoordinator) {
         this.props = props;
         this.wechat = wechat;
         this.alipay = alipay;
@@ -52,6 +56,15 @@ public class PaymentService {
         this.orderMapper = orderMapper;
         this.payLog = payLog;
         this.walletService = walletService;
+        this.walletPaymentCoordinator = walletPaymentCoordinator;
+    }
+
+    /** Keeps direct service construction compatible with unit tests; Spring injects the transactional bean above. */
+    public PaymentService(PaymentProperties props, WechatPayClient wechat, AlipayPayClient alipay,
+                          OrderService orderService, OrderMapper orderMapper, PaymentLogService payLog,
+                          WalletService walletService) {
+        this(props, wechat, alipay, orderService, orderMapper, payLog, walletService,
+                new WalletPaymentCoordinator(walletService, orderService));
     }
 
     // ===== 发起支付 =====
@@ -102,18 +115,8 @@ public class PaymentService {
     }
 
     /** 钱包渠道支付：扣款与结算同事务，并发重复发起时仅一次生效 */
-    @Transactional
     public Map<String, Object> walletPay(String orderNo, Long userId, BigDecimal amount) {
-        WalletLog wl = walletService.payFromWallet(userId, amount, orderNo);
-        boolean settled = orderService.settlePaid(orderNo, "wallet", "W" + wl.getId());
-        if (!settled) {
-            // 并发下订单已被支付：抛异常回滚本次扣款
-            throw new BusinessException("订单已支付，钱包扣款已撤销");
-        }
-        Map<String, Object> m = new HashMap<>();
-        m.put("paid", true);
-        m.put("balance", walletService.balanceOf(userId));
-        return m;
+        return walletPaymentCoordinator.pay(orderNo, userId, amount);
     }
 
     /** 仅开发/演示环境允许的模拟支付确认入口 */
@@ -251,8 +254,13 @@ public class PaymentService {
      * 资金路径按原支付渠道退回：wallet 原路入账钱包；wechat/alipay 调渠道退款接口；mock 仅记录。
      * 全额退款额外触发回退结算：恢复库存、扣回支付所得积分、返还抵现积分、订单置为已退款。
      */
+    @Transactional
     public boolean refund(RefundRequest req, Long adminId) {
-        Order o = orderMapper.selectById(req.getOrderNo());
+        // Lock the order row while calculating remaining refundable balance. Concurrent refunds
+        // now serialize and re-check the latest committed refund amount before calling a channel.
+        Order o = orderMapper.selectOne(Wrappers.<Order>lambdaQuery()
+                .eq(Order::getOrderNo, req.getOrderNo())
+                .last("LIMIT 1 FOR UPDATE"));
         if (o == null) throw new BusinessException("订单不存在");
         if (!isPaid(o)) throw new BusinessException("未支付订单不可退款");
         if ("success".equals(o.getRefundStatus())) throw new BusinessException("该订单已全额退款");
