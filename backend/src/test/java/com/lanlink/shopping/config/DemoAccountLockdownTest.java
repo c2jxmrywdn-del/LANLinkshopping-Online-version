@@ -39,13 +39,27 @@ class DemoAccountLockdownTest {
     }
 
     @Test
-    void doesNotTouchAnyAccountsWhenDemoAccountsAreExplicitlyEnabled() {
+    void stillLocksLegacyFixtureAccountsWhenReadOnlyDemoAccountsAreEnabled() {
         UserMapper userMapper = mock(UserMapper.class);
         PasswordEncoder encoder = mock(PasswordEncoder.class);
+        User legacyFixture = new User();
+        legacyFixture.setUserId(9L);
+        legacyFixture.setPhone("13800000000");
+        legacyFixture.setNickname("平台运营");
+        legacyFixture.setPassword("encoded-demo-password");
+
+        AtomicInteger lookupCount = new AtomicInteger();
+        when(userMapper.selectOne(any(Wrapper.class))).thenAnswer(invocation ->
+                lookupCount.getAndIncrement() == 0 ? legacyFixture : null);
+        when(encoder.matches("123456", "encoded-demo-password")).thenReturn(true);
+        when(encoder.encode(anyString())).thenReturn("encoded-random-password");
 
         new DemoAccountLockdown(userMapper, encoder, true, false).run();
 
-        verifyNoInteractions(userMapper, encoder);
+        verify(userMapper, times(3)).selectOne(any(Wrapper.class));
+        verify(encoder, times(1)).encode(anyString());
+        verify(userMapper, times(1)).updateById(legacyFixture);
+        assertEquals("encoded-random-password", legacyFixture.getPassword());
     }
 
     @Test

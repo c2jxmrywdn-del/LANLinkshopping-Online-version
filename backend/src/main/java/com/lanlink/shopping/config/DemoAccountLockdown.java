@@ -44,6 +44,7 @@ public class DemoAccountLockdown implements CommandLineRunner {
     public DemoAccountLockdown(
             UserMapper userMapper,
             PasswordEncoder passwordEncoder,
+            @Value("${app.demo.accounts.enabled:false}") boolean ignoredDemoAccountsEnabled,
             @Value("${lanlink.demo-data.enabled:false}") boolean demoDataEnabled) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
