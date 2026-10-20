@@ -1,8 +1,18 @@
 import { defineStore } from 'pinia'
 import { authApi, userApi } from '../api'
 
+function readStoredUser() {
+  try {
+    const value = localStorage.getItem('ll_user')
+    return value ? JSON.parse(value) : null
+  } catch (e) {
+    return null
+  }
+}
+
 export const useUserStore = defineStore('user', {
-  state: () => ({ user: null }),
+  // Restore the cached display identity after refresh, then verify it against the server.
+  state: () => ({ user: readStoredUser() }),
   getters: {
     logged: (s) => !!s.user,
     // ===== 身份类型（服务端 /auth/me 实时识别返回） =====
@@ -40,7 +50,12 @@ export const useUserStore = defineStore('user', {
       try {
         this.user = await authApi.me()
         localStorage.setItem('ll_user', JSON.stringify(this.user))
-      } catch (e) { this.user = null }
+        return this.user
+      } catch (e) {
+        this.user = null
+        localStorage.removeItem('ll_user')
+        return null
+      }
     },
     /** 写入绝对未读数（登录后由 /auth/me 带回，或读操作后本地更新） */
     setUnread(n) {
