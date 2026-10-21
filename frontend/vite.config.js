@@ -1,14 +1,23 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // Only register Ant Design Vue components actually referenced by templates.
+    // Ant Design Vue uses CSS-in-JS, so its component styles are generated on demand.
+    Components({
+      resolvers: [AntDesignVueResolver({ importStyle: false })]
+    })
+  ],
   build: {
     rollupOptions: {
       output: {
-        // 第三方框架分包：利于浏览器缓存与并行加载，降低首屏 JS 阻塞
+        // Keep framework/vendor code cacheable without forcing the entire Ant Design Vue
+        // package barrel into a single eagerly-loaded chunk.
         manualChunks: {
-          'antd': ['ant-design-vue'],
           'vue-vendor': ['vue', 'vue-router', 'pinia', 'axios'],
           'swiper': ['swiper']
         }
