@@ -876,7 +876,7 @@ const UI_ZH_EN = {
   "切换为英文": "Switch to English",
   "项目作者信息": "Project Author Information",
   "B2B 聚合型电商平台毕业设计": "B2B Aggregated Commerce Graduation Project",
-  "信息": "Information"
+  "信息": "Information",
   // Order lifecycle and configured payment-channel workflow.
   '在线支付订单':'Online Payment Order',
   '账期已开单':'Credit Term Booked',
