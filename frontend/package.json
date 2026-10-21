@@ -13,7 +13,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node scripts/check-i18n-duplicates.mjs && vitest run",
-    "lighthouse": "node scripts/lighthouse-check.mjs"
+    "lighthouse": "node scripts/lighthouse-check.mjs",
+    "prebuild": "npm audit || true"
   },
   "dependencies": {
     "ant-design-vue": "^4.2.6",
