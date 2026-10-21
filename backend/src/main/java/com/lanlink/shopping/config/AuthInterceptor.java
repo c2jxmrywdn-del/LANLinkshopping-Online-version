@@ -43,6 +43,13 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // Allow the session-scoped CSRF bootstrap token before authentication; the endpoint is GET-only.
+        // Prevent shared/browser caches from retaining a session-specific token.
+        if ("GET".equalsIgnoreCase(request.getMethod()) && "/user/csrf-token".equals(uri)) {
+            response.setHeader("Cache-Control", "no-store");
+            return true;
+        }
+
         // Public demo accounts may browse but must never mutate production data.
         if (isDemoReadOnlySession(request)) {
             // Permit a real login to replace the demo session and permit logout.

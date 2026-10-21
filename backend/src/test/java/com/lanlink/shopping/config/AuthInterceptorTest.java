@@ -31,6 +31,17 @@ class AuthInterceptorTest {
     }
 
     @Test
+    void csrfBootstrapEndpointIsPublicForGetWithoutResolvingUserIdentity() throws Exception {
+        when(request.getRequestURI()).thenReturn("/api/user/csrf-token");
+        when(request.getMethod()).thenReturn("GET");
+
+        assertTrue(interceptor.preHandle(request, response, new Object()));
+
+        verify(response).setHeader("Cache-Control", "no-store");
+        verifyNoInteractions(identityService, auditService);
+    }
+
+    @Test
     void actuatorHealthEndpointsArePublicWithoutResolvingUserIdentity() throws Exception {
         for (String uri : List.of(
                 "/api/actuator/health",
